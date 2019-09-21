@@ -46,7 +46,7 @@ public class ClientConnection implements Connection {
         handlerList.add(new DefaultDecoder());
         //设置client请求server的请求类的编码类
         handlerList.add(new ClientRequestEncoder());
-        connectionHandler = new ClientConnectionHandler();
+        connectionHandler = new ClientConnectionHandler(this.client);
         handlerList.add(connectionHandler);
         return handlerList;
     }
@@ -88,5 +88,10 @@ public class ClientConnection implements Connection {
      */
     public boolean isUsable() {
         return client.isUsable();
+    }
+
+    @Override
+    public void close() {
+        connectionHandler.close();
     }
 }
