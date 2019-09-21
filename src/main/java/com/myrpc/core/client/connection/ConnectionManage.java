@@ -2,6 +2,7 @@ package com.myrpc.core.client.connection;
 
 
 import com.myrpc.core.client.ClientRequest;
+import com.myrpc.core.common.bo.ServerInfo;
 import com.myrpc.core.server.ServerResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -9,6 +10,42 @@ import org.apache.log4j.Logger;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * ////////////////////////////////////////////////////////////////////
+ * //                          _ooOoo_                               //
+ * //                         o8888888o                              //
+ * //                         88" . "88                              //
+ * //                         (| ^_^ |)                              //
+ * //                         O\  =  /O                              //
+ * //                      ____/`---'\____                           //
+ * //                    .'  \\|     |//  `.                         //
+ * //                   /  \\|||  :  |||//  \                        //
+ * //                  /  _||||| -:- |||||-  \                       //
+ * //                  |   | \\\  -  /// |   |                       //
+ * //                  | \_|  ''\---/''  |   |                       //
+ * //                  \  .-\__  `-`  ___/-. /                       //
+ * //                ___`. .'  /--.--\  `. . ___                     //
+ * //              ."" '<  `.___\_<|>_/___.'  >'"".                  //
+ * //            | | :  `- \`.;`\ _ /`;.`/ - ` : | |                 //
+ * //            \  \ `-.   \_ __\ /__ _/   .-` /  /                 //
+ * //      ========`-.____`-.___\_____/___.-`____.-'========         //
+ * //                           `=---='                              //
+ * //      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^        //
+ * //         佛祖保佑           永无BUG           永不修改           //
+ * //          佛曰:                                                 //
+ * //                 写字楼里写字间，写字间里程序员;                 //
+ * //                 程序人员写程序，又拿程序换酒钱.                 //
+ * //                 酒醒只在网上坐，酒醉还来网下眠;                 //
+ * //                 酒醉酒醒日复日，网上网下年复年.                 //
+ * //                 但愿老死电脑间，不愿鞠躬老板前;                 //
+ * //                 奔驰宝马贵者趣，公交自行程序员.                 //
+ * //                 别人笑我忒疯癫，我笑自己命太贱;                 //
+ * //                 不见满街漂亮妹，哪个归得程序员?                 //
+ * ////////////////////////////////////////////////////////////////////
+ * 创建时间: 2019/9/22 0:06
+ * 作者: linzhou
+ * 描述: 客户端与服务端的连接管理类
+ */
 public class ConnectionManage {
 
     private static final Logger log = Logger.getLogger(ConnectionManage.class);
@@ -23,20 +60,22 @@ public class ConnectionManage {
     /**
      * 通过服务器ip和端口获取连接
      *
-     * @param address 服务器ip
-     * @param port    端口
-     * @return
+     * @param serverInfo 服务器信息
+     * @return 一个可用的服务器连接
      */
-    public static Connection getConnection(String address, int port) {
-        return CONNECTION_MANAGE.getConnection0(address, port);
+    public static Connection getConnection(ServerInfo serverInfo) {
+        return CONNECTION_MANAGE.getConnection0(serverInfo.getAddress(), serverInfo.getPort());
     }
 
     /**
      * 通过服务器ip和端口删除客户端连接
      *
-     * @param address
-     * @param port
+     * @param serverInfo 服务器信息
      */
+    public static void closeConnection(ServerInfo serverInfo) {
+        closeConnection(serverInfo.getAddress(), serverInfo.getPort());
+    }
+
     public static void closeConnection(String address, int port) {
         String key = getConnectionKey(address, port);
         CONNECTION_MANAGE.closeConnection(key);
@@ -109,16 +148,17 @@ public class ConnectionManage {
     }
 
     private static void sendMsg(String address, int port) throws InterruptedException {
-        Connection connection = ConnectionManage.getConnection(address, port);
+        ServerInfo serverInfo = new ServerInfo(address, port);
+        Connection connection = ConnectionManage.getConnection(serverInfo);
         log.info("==========================getConnection");
         if (connection != null) {
             Thread.sleep(3000);
             ClientRequest request = new ClientRequest();
-            request.setClassName("className").setMethod("method");
+            request.setClassNames(new String[]{"className"}).setMethodName("method");
             ServerResponse response = connection.sendMsg(request);
             log.info("==========================response1:" + response);
             request = new ClientRequest();
-            request.setClassName("className").setMethod("method");
+            request.setClassNames(new String[]{"className"}).setMethodName("method");
             response = connection.sendMsg(request);
             log.info("==========================response2:" + response);
 

@@ -1,10 +1,4 @@
-package com.myrpc.utils;
-
-
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-
+package com.myrpc.core.common.bo;
 
 /**
  * ////////////////////////////////////////////////////////////////////
@@ -38,36 +32,25 @@ import java.util.List;
  * //                 别人笑我忒疯癫，我笑自己命太贱;                 //
  * //                 不见满街漂亮妹，哪个归得程序员?                 //
  * ////////////////////////////////////////////////////////////////////
- * 创建时间: 2019/9/22 0:06
+ * 创建时间: 2019/9/22 0:21
  * 作者: linzhou
- * 描述: 序列化与反序列化工具类
+ * 描述: 服务器信息存储类
  */
-public class Serializer {
-    public static byte[] serialize(Object obj) throws IOException {
-        try(ByteArrayOutputStream b = new ByteArrayOutputStream()){
-            try(ObjectOutputStream o = new ObjectOutputStream(b)){
-                o.writeObject(obj);
-            }
-            return b.toByteArray();
-        }
+public class ServerInfo {
+    private String address;
+
+    private int port;
+
+    public ServerInfo(String address, int port) {
+        this.address = address;
+        this.port = port;
     }
 
-    public static Object deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
-        try(ByteArrayInputStream b = new ByteArrayInputStream(bytes)){
-            try(ObjectInputStream o = new ObjectInputStream(b)){
-                return o.readObject();
-            }
-        }
+    public String getAddress() {
+        return address;
     }
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
-        List<String> list = new ArrayList<>();
-        list.add("123");
-        list.add("1234");
-        list.add("1235");
-        list.add("1236");
-        byte[] bytes = serialize(list);
-        System.out.println(bytes);
-        System.out.println(deserialize(bytes).toString());
+    public int getPort() {
+        return port;
     }
 }

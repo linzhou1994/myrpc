@@ -14,9 +14,6 @@ public class ServerResponse<T> implements Serializable {
         this.uuid = uuid;
     }
 
-    public void setException(Throwable exception) {
-        this.exception = exception;
-    }
 
     public String getUuid() {
         return uuid;
@@ -26,8 +23,20 @@ public class ServerResponse<T> implements Serializable {
         return rlt;
     }
 
+    public Throwable getException() {
+        return exception;
+    }
+
     public void setRlt(T rlt) {
         this.rlt = rlt;
+    }
+
+    public void setException(Throwable exception) {
+        this.exception = exception;
+    }
+
+    public boolean isException() {
+        return exception != null;
     }
 
     @Override

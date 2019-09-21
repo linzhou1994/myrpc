@@ -1,20 +1,49 @@
 package com.myrpc.core.client;
 
+import com.myrpc.core.client.config.ClientProxyConfig;
 import com.myrpc.core.server.ServerResponse;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.UUID;
 
+/**
+ * ////////////////////////////////////////////////////////////////////
+ * //                          _ooOoo_                               //
+ * //                         o8888888o                              //
+ * //                         88" . "88                              //
+ * //                         (| ^_^ |)                              //
+ * //                         O\  =  /O                              //
+ * //                      ____/`---'\____                           //
+ * //                    .'  \\|     |//  `.                         //
+ * //                   /  \\|||  :  |||//  \                        //
+ * //                  /  _||||| -:- |||||-  \                       //
+ * //                  |   | \\\  -  /// |   |                       //
+ * //                  | \_|  ''\---/''  |   |                       //
+ * //                  \  .-\__  `-`  ___/-. /                       //
+ * //                ___`. .'  /--.--\  `. . ___                     //
+ * //              ."" '<  `.___\_<|>_/___.'  >'"".                  //
+ * //            | | :  `- \`.;`\ _ /`;.`/ - ` : | |                 //
+ * //            \  \ `-.   \_ __\ /__ _/   .-` /  /                 //
+ * //      ========`-.____`-.___\_____/___.-`____.-'========         //
+ * //                           `=---='                              //
+ * //      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^        //
+ * //         佛祖保佑           永无BUG           永不修改           //
+ * //          佛曰:                                                 //
+ * //                 写字楼里写字间，写字间里程序员;                 //
+ * //                 程序人员写程序，又拿程序换酒钱.                 //
+ * //                 酒醒只在网上坐，酒醉还来网下眠;                 //
+ * //                 酒醉酒醒日复日，网上网下年复年.                 //
+ * //                 但愿老死电脑间，不愿鞠躬老板前;                 //
+ * //                 奔驰宝马贵者趣，公交自行程序员.                 //
+ * //                 别人笑我忒疯癫，我笑自己命太贱;                 //
+ * //                 不见满街漂亮妹，哪个归得程序员?                 //
+ * ////////////////////////////////////////////////////////////////////
+ * 创建时间: 2019/9/22 0:06
+ * 作者: linzhou
+ * 描述: 客户端请求封装类
+ */
 public class ClientRequest implements Serializable {
-
-    /**
-     * 默认重试次数
-     */
-    private static final int DEFAULT_RETRY_COUNT = 0;
-    /**
-     * 默认请求超时时间
-     */
-    private static final long DEFAULT_TIME_OUT = 3000L;
     /**
      * 本次请求的唯一编码
      */
@@ -36,11 +65,11 @@ public class ClientRequest implements Serializable {
     /**
      * 请求类名称
      */
-    private String className;
+    private String[] classNames;
     /**
      * 请求方法
      */
-    private String method;
+    private String methodName;
     /**
      * 请求参数
      */
@@ -48,8 +77,8 @@ public class ClientRequest implements Serializable {
 
     public ClientRequest() {
         this.uuid = UUID.randomUUID().toString();
-        this.retryCount = DEFAULT_RETRY_COUNT;
-        this.timeOut = DEFAULT_TIME_OUT;
+        this.retryCount = ClientProxyConfig.DEFAULT_RETRY_COUNT;
+        this.timeOut = ClientProxyConfig.DEFAULT_TIME_OUT;
     }
 
     public String getUuid() {
@@ -68,12 +97,12 @@ public class ClientRequest implements Serializable {
         return timeOut;
     }
 
-    public String getClassName() {
-        return className;
+    public String[] getClassNames() {
+        return classNames;
     }
 
-    public String getMethod() {
-        return method;
+    public String getMethodName() {
+        return methodName;
     }
 
     public Object[] getParams() {
@@ -95,13 +124,13 @@ public class ClientRequest implements Serializable {
         return this;
     }
 
-    public ClientRequest setClassName(String className) {
-        this.className = className;
+    public ClientRequest setClassNames(String[] classNames) {
+        this.classNames = classNames;
         return this;
     }
 
-    public ClientRequest setMethod(String method) {
-        this.method = method;
+    public ClientRequest setMethodName(String methodName) {
+        this.methodName = methodName;
         return this;
     }
 
@@ -114,7 +143,11 @@ public class ClientRequest implements Serializable {
     public String toString() {
         return "ClientRequest{" +
                 "uuid='" + uuid + '\'' +
-                ", response=" + response +
+                ", retryCount=" + retryCount +
+                ", timeOut=" + timeOut +
+                ", classNames='" + classNames + '\'' +
+                ", methodName='" + methodName + '\'' +
+                ", params=" + Arrays.toString(params) +
                 '}';
     }
 }
