@@ -67,7 +67,7 @@ public class JavaClientProxy implements InvocationHandler {
     public JavaClientProxy(Class[] clazzs, LoadBalancingStrategy strategy) {
         this.strategy = strategy;
         this.clazzs = clazzs;
-        String[] classNames = new String[this.clazzs.length];
+        classNames = new String[this.clazzs.length];
         for (int i = 0; i < 0; i++) {
             classNames[i] = this.clazzs[i].getName();
         }
