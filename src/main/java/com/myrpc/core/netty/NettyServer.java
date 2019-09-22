@@ -98,7 +98,6 @@ public class NettyServer {
 
                                 childHandlerList.forEach(clazz -> {
                                     try {
-                                        log.info("ChannelPipeline addLast Class:" + clazz.getName());
                                         p.addLast((ChannelHandler) clazz.newInstance());
                                     } catch (Exception e) {
                                         e.printStackTrace();

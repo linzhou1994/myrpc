@@ -99,4 +99,20 @@ public class ReflectionUtil {
             throw new RuntimeException(e);
         }
     }
+
+
+    /**
+     * 获取参数类型名称
+     *
+     * @return
+     */
+    public static String[] getMethodParameterTypeNames(Method method) {
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        String[] rlt = new String[parameterTypes.length];
+        for (int i = 0; i < parameterTypes.length; i++) {
+            rlt[i] = parameterTypes[i].getName();
+
+        }
+        return rlt;
+    }
 }

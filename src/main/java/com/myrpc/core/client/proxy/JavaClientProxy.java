@@ -8,6 +8,7 @@ import com.myrpc.core.client.connection.ConnectionManage;
 import com.myrpc.core.common.bo.ServerInfo;
 import com.myrpc.core.exception.ServerException;
 import com.myrpc.core.server.ServerResponse;
+import com.myrpc.utils.ReflectionUtil;
 import org.apache.log4j.Logger;
 
 import java.lang.reflect.InvocationHandler;
@@ -69,7 +70,7 @@ public class JavaClientProxy implements InvocationHandler {
         this.strategy = strategy;
         this.clazzs = clazzs;
         classNames = new String[this.clazzs.length];
-        for (int i = 0; i < 0; i++) {
+        for (int i = 0; i < clazzs.length; i++) {
             classNames[i] = this.clazzs[i].getName();
         }
 
@@ -80,7 +81,7 @@ public class JavaClientProxy implements InvocationHandler {
         this.config = config;
     }
 
-    private Object newProxyInstance() {
+    public Object newProxyInstance() {
         return Proxy.newProxyInstance(this.getClass().getClassLoader(), clazzs, this);
     }
 
@@ -95,12 +96,13 @@ public class JavaClientProxy implements InvocationHandler {
             throw new ServerException("No find usable server！ClientRequest：" + request);
         }
         Connection connection = ConnectionManage.getConnection(serverInfo);
-        if (connection == null || connection.isUsable()) {
+        if (connection == null || !connection.isUsable()) {
             throw new ServerException("Unable to connect to server！ClientRequest：" + request);
         }
         ServerResponse response = connection.sendMsg(request);
         if (response == null) {
             log.info("Request time out！ClientRequest：" + request);
+            return null;
         }
         //如果服务端发送异常，则向外抛出异常
         if (response.isException()) {
@@ -114,7 +116,8 @@ public class JavaClientProxy implements InvocationHandler {
         ClientRequest request = new ClientRequest();
         request.setClassNames(classNames)
                 .setMethodName(method.getName())
-                .setParams(args);
+                .setParams(args)
+                .setParameterClassNames(ReflectionUtil.getMethodParameterTypeNames(method));
         if (config != null) {
             request.setRetryCount(config.getRetryCount())
                     .setTimeOut(config.getTimeOut());

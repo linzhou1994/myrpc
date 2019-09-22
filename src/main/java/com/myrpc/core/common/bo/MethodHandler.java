@@ -1,9 +1,11 @@
 package com.myrpc.core.common.bo;
 
 import com.myrpc.utils.ReflectionUtil;
+import org.apache.log4j.Logger;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 /**
  * ////////////////////////////////////////////////////////////////////
@@ -43,6 +45,7 @@ import java.lang.reflect.Method;
  * @描述: MethodHandler
  */
 public class MethodHandler implements Serializable {
+    private static final Logger log = Logger.getLogger(MethodHandler.class);
 
     /**
      * 方法所在对象
@@ -58,6 +61,10 @@ public class MethodHandler implements Serializable {
      */
     private Method method;
 
+    private String methodName;
+
+    private String[] parameterClassNames;
+
     public MethodHandler(Object targ, Method method) {
         if (targ == null || method == null) {
             throw new IllegalArgumentException("targ or method cannot is null!");
@@ -67,11 +74,22 @@ public class MethodHandler implements Serializable {
         //获取targ的类名及所有实现接口的名称
         Class targClass = targ.getClass();
         Class[] interfaces = targClass.getInterfaces();
-        clazzNames = new String[interfaces.length + 1];
-        clazzNames[0] = targClass.getName();
+        clazzNames = new String[interfaces.length];
         for (int i = 0; i < interfaces.length; i++) {
-            clazzNames[i + 1] = interfaces[i].getName();
+            clazzNames[i] = interfaces[i].getName();
         }
+        //获取方法的所有参数类型
+        parameterClassNames = ReflectionUtil.getMethodParameterTypeNames(this.method);
+        methodName = method.getName();
+    }
+
+
+    public String[] getParameterClassNames() {
+        return parameterClassNames;
+    }
+
+    public String getMethodName() {
+        return methodName;
     }
 
     /**
@@ -81,6 +99,7 @@ public class MethodHandler implements Serializable {
      * @return
      */
     public Object invoke(Object... args) {
+        log.info(Arrays.toString(args));
         return ReflectionUtil.invokeMethod(targ, method, args);
     }
 

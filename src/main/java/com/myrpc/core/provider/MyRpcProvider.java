@@ -44,5 +44,5 @@ public interface MyRpcProvider {
      *
      * @param object 要注册的对象
      */
-    void registered(Object object);
+    void registered(Object object) throws Exception;
 }

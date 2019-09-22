@@ -110,12 +110,10 @@ public class NettyClient {
             protected void initChannel(SocketChannel ch) {
 
                 if (childHandlerList != null) {
-                    log.info("============initChannel childHandlerList size:" + childHandlerList.size());
                     ChannelPipeline p = ch.pipeline();
 
                     for (int i = 0; i < childHandlerList.size(); i++) {
                         ChannelHandler handler = childHandlerList.get(i);
-                        log.info("ChannelPipeline addLast:" + handler.getClass().getName());
                         p.addLast(handler);
                     }
                 }

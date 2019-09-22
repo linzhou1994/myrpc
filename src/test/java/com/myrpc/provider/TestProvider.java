@@ -1,5 +1,15 @@
 package com.myrpc.provider;
 
+import com.myrpc.core.common.bo.MethodHandler;
+import com.myrpc.core.provider.MyRpcProvider;
+import com.myrpc.core.server.container.ServiceContainerManager;
+
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * ////////////////////////////////////////////////////////////////////
  * //                          _ooOoo_                               //
@@ -37,5 +47,26 @@ package com.myrpc.provider;
  * @author: linzhou
  * @描述: TestProvider
  */
-public class TestProvider {
+public class TestProvider implements MyRpcProvider {
+    @Override
+    public void registered(Object object) throws Exception {
+        Class clazz = object.getClass();
+        Class<?>[] interfaces = clazz.getInterfaces();
+        Set<Method> methodSet = new HashSet<>();
+        for (Class<?> anInterface : interfaces) {
+            Method[] methods = anInterface.getMethods();
+            for (Method method : methods) {
+                String methodName = method.getName();
+                Class<?>[] parameterTypes = method.getParameterTypes();
+                Method objectMethod = clazz.getMethod(methodName,parameterTypes);
+                methodSet.add(objectMethod);
+            }
+        }
+
+        methodSet.forEach(method -> {
+            MethodHandler methodHandler = new MethodHandler(object,method);
+            ServiceContainerManager.CONTAINER.registered(methodHandler);
+        });
+
+    }
 }

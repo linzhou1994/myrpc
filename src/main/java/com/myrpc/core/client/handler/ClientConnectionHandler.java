@@ -7,6 +7,7 @@ import com.myrpc.core.server.ServerResponse;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -50,6 +51,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ClientConnectionHandler extends SimpleChannelInboundHandler<ServerResponse> {
 
+    private static final Logger log = Logger.getLogger(ClientConnectionHandler.class);
+
     private final Map<String, ClientRequest> requestParamMap = new ConcurrentHashMap<>();
     private ChannelHandlerContext ctx;
 
@@ -75,10 +78,10 @@ public class ClientConnectionHandler extends SimpleChannelInboundHandler<ServerR
      */
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, ServerResponse response) throws Exception {
-        System.out.println(response);
         String key = response.getUuid();
         ClientRequest clientRequest = getRequestParam(key);
         clientRequest.setResponse(response);
+        log.info(clientRequest);
         synchronized (clientRequest) {
             clientRequest.notifyAll();
         }
@@ -134,7 +137,7 @@ public class ClientConnectionHandler extends SimpleChannelInboundHandler<ServerR
                 int retryCount = clientRequest.getRetryCount();
                 long timeOut = clientRequest.getTimeOut();
                 //如果重试次数没有小于0并且未收到服务端的返回并且客户端连接依然可用，则重试向服务端发送消息
-                while (retryCount-- < 0 && clientRequest.getResponse() == null && client.isUsable()) {
+                while (retryCount-- >= 0 && clientRequest.getResponse() == null && client.isUsable()) {
 
                     if (ctx != null) {
                         ctx.writeAndFlush(clientRequest);

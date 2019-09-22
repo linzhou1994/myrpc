@@ -76,6 +76,8 @@ public class ClientRequest implements Serializable {
      */
     private Object[] params;
 
+    private String[] parameterClassNames;
+
     public ClientRequest() {
         this.uuid = UUID.randomUUID().toString();
         this.retryCount = ClientProxyConfig.DEFAULT_RETRY_COUNT;
@@ -110,6 +112,10 @@ public class ClientRequest implements Serializable {
         return params;
     }
 
+    public String[] getParameterClassNames() {
+        return parameterClassNames;
+    }
+
     public ClientRequest setResponse(ServerResponse response) {
         this.response = response;
         return this;
@@ -140,13 +146,19 @@ public class ClientRequest implements Serializable {
         return this;
     }
 
+    public ClientRequest setParameterClassNames(String[] parameterClassNames) {
+        this.parameterClassNames = parameterClassNames;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "ClientRequest{" +
                 "uuid='" + uuid + '\'' +
+                ", response=" + response +
                 ", retryCount=" + retryCount +
                 ", timeOut=" + timeOut +
-                ", classNames='" + classNames + '\'' +
+                ", classNames=" + Arrays.toString(classNames) +
                 ", methodName='" + methodName + '\'' +
                 ", params=" + Arrays.toString(params) +
                 '}';

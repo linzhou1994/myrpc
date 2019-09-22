@@ -1,11 +1,11 @@
 package com.myrpc.core.server.container;
 
 import com.myrpc.core.common.bo.MethodHandler;
-import com.sun.istack.internal.NotNull;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -62,7 +62,9 @@ public class ServiceContainerManager {
      * @param methodHandler
      */
     public void registered(MethodHandler methodHandler) {
-        String[] keys = methodHandler.getClazzNames();
+        String[] classNames = methodHandler.getClazzNames();
+        String[] parameterClassNames = methodHandler.getParameterClassNames();
+        Set<String> keys = getMethodHandlerKeys(classNames, methodHandler.getMethodName(), parameterClassNames);
         if (keys != null) {
             for (String key : keys) {
                 if (StringUtils.isNotBlank(key) && methodHandler != null) {
@@ -72,8 +74,9 @@ public class ServiceContainerManager {
         }
     }
 
-    public MethodHandler getMethodHander(@NotNull String[] keys) {
+    public MethodHandler getMethodHander(String[] classNames,String methodName,String[] paramClassNames) {
         MethodHandler rlt;
+        Set<String> keys = getMethodHandlerKeys(classNames, methodName, paramClassNames);
         for (String key : keys) {
             rlt = methodContainer.get(key);
             if (rlt != null) {
@@ -83,5 +86,22 @@ public class ServiceContainerManager {
         return null;
     }
 
+    private Set<String> getMethodHandlerKeys(String[] classNames, String methodName, String[] paramClassNames) {
+        Set<String> keys = new HashSet<>();
+        for (String className : classNames) {
+            keys.add(getMethodHanderKey(className,methodName,paramClassNames));
+        }
+        return keys;
+    }
+
+
+    private String getMethodHanderKey(String className,String methodName,String[] paramClassNames){
+        StringBuilder keySb = new StringBuilder();
+        keySb.append(className).append("&").append(methodName).append("&");
+        for (String paramClassName : paramClassNames) {
+            keySb.append(paramClassName).append("&");
+        }
+        return keySb.toString();
+    }
 
 }
