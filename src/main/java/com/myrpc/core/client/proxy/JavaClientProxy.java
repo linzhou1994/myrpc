@@ -1,6 +1,6 @@
 package com.myrpc.core.client.proxy;
 
-import com.myrpc.core.balancing.LoadBalancingStrategy;
+import com.myrpc.core.consumer.MyRpcConsumer;
 import com.myrpc.core.client.ClientRequest;
 import com.myrpc.core.client.config.ClientProxyConfig;
 import com.myrpc.core.client.connection.Connection;
@@ -62,9 +62,9 @@ public class JavaClientProxy implements InvocationHandler {
 
     private String[] classNames;
 
-    private LoadBalancingStrategy strategy;
+    private MyRpcConsumer strategy;
 
-    public JavaClientProxy(Class[] clazzs, LoadBalancingStrategy strategy) {
+    public JavaClientProxy(Class[] clazzs, MyRpcConsumer strategy) {
         this.strategy = strategy;
         this.clazzs = clazzs;
         classNames = new String[this.clazzs.length];
@@ -74,7 +74,7 @@ public class JavaClientProxy implements InvocationHandler {
 
     }
 
-    public JavaClientProxy(ClientProxyConfig config, Class[] clazzs, LoadBalancingStrategy strategy) {
+    public JavaClientProxy(ClientProxyConfig config, Class[] clazzs, MyRpcConsumer strategy) {
         this(clazzs, strategy);
         this.config = config;
     }
@@ -87,7 +87,7 @@ public class JavaClientProxy implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         ClientRequest request = createClientRequest(config, classNames, method, args);
         if (strategy == null) {
-            throw new IllegalArgumentException("LoadBalancingStrategy cannot is null!");
+            throw new IllegalArgumentException("MyRpcConsumer cannot is null!");
         }
         ServerInfo serverInfo = strategy.getServerInfo(request);
         if (serverInfo == null) {

@@ -1,4 +1,4 @@
-package com.myrpc.core.balancing;
+package com.myrpc.core.consumer;
 
 import com.myrpc.core.client.ClientRequest;
 import com.myrpc.core.common.bo.ServerInfo;
@@ -39,7 +39,7 @@ import com.myrpc.core.common.bo.ServerInfo;
  * 作者: linzhou
  * 描述: LoadBalancingStrategy负载均衡策略接口
  */
-public interface LoadBalancingStrategy {
+public interface MyRpcConsumer {
 
     /**
      * 获取本次请求访问的服务器的信息
