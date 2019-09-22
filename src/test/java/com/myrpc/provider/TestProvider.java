@@ -50,23 +50,9 @@ import java.util.Set;
 public class TestProvider implements MyRpcProvider {
     @Override
     public void registered(Object object) throws Exception {
-        Class clazz = object.getClass();
-        Class<?>[] interfaces = clazz.getInterfaces();
-        Set<Method> methodSet = new HashSet<>();
-        for (Class<?> anInterface : interfaces) {
-            Method[] methods = anInterface.getMethods();
-            for (Method method : methods) {
-                String methodName = method.getName();
-                Class<?>[] parameterTypes = method.getParameterTypes();
-                Method objectMethod = clazz.getMethod(methodName,parameterTypes);
-                methodSet.add(objectMethod);
-            }
-        }
 
-        methodSet.forEach(method -> {
-            MethodHandler methodHandler = new MethodHandler(object,method);
-            ServiceContainerManager.CONTAINER.registered(methodHandler);
-        });
+        ServiceContainerManager.CONTAINER.registered(object);
+
 
     }
 }

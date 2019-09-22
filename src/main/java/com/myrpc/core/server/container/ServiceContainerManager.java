@@ -3,6 +3,7 @@ package com.myrpc.core.server.container;
 import com.myrpc.core.common.bo.MethodHandler;
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -54,6 +55,31 @@ public class ServiceContainerManager {
 
     private ServiceContainerManager() {
         methodContainer = new ConcurrentHashMap<>();
+    }
+
+    /**
+     * 将对象加入到方法容器中
+     * @param object
+     * @throws Exception
+     */
+    public void registered(Object object) throws Exception {
+        Class clazz = object.getClass();
+        Class<?>[] interfaces = clazz.getInterfaces();
+        Set<Method> methodSet = new HashSet<>();
+        for (Class<?> anInterface : interfaces) {
+            Method[] methods = anInterface.getMethods();
+            for (Method method : methods) {
+                String methodName = method.getName();
+                Class<?>[] parameterTypes = method.getParameterTypes();
+                Method objectMethod = clazz.getMethod(methodName,parameterTypes);
+                methodSet.add(objectMethod);
+            }
+        }
+
+        methodSet.forEach(method -> {
+            MethodHandler methodHandler = new MethodHandler(object,method);
+            registered(methodHandler);
+        });
     }
 
     /**
