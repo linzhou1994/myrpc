@@ -49,9 +49,12 @@ import java.io.IOException;
 public class ServerResponseEncoder extends MessageToByteEncoder<ServerResponse> {
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, ServerResponse serverResponse, ByteBuf byteBuf) {
-        byte[] body = convertToBytes(serverResponse);  //将对象转换为byte
-        int dataLength = body.length;  //读取消息的长度
-        byteBuf.writeInt(dataLength);  //先将消息长度写入，也就是消息头
+        //将对象转换为byte
+        byte[] body = convertToBytes(serverResponse);
+        //读取消息的长度
+        int dataLength = body.length;
+        //先将消息长度写入，也就是消息头
+        byteBuf.writeInt(dataLength);
         byteBuf.writeBytes(body);
     }
 

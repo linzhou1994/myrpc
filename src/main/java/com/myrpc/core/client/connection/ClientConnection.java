@@ -122,6 +122,7 @@ public class ClientConnection implements Connection {
      *
      * @return
      */
+    @Override
     public boolean isUsable() {
         return client.isUsable();
     }

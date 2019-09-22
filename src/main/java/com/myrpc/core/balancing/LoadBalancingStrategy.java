@@ -41,5 +41,10 @@ import com.myrpc.core.common.bo.ServerInfo;
  */
 public interface LoadBalancingStrategy {
 
+    /**
+     * 获取本次请求访问的服务器的信息
+     * @param request
+     * @return
+     */
     ServerInfo getServerInfo(ClientRequest request);
 }

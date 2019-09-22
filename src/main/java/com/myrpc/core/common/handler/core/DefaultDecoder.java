@@ -73,7 +73,7 @@ public class DefaultDecoder extends ByteToMessageDecoder {
         }
         //根据长度创建字节数组接收
         byte[] body = new byte[dataLength];
-        byteBuf.readBytes(body);  //
+        byteBuf.readBytes(body);
         //将byte数据转化为需要的对象
         Object o = convertToObject(body);
         list.add(o);

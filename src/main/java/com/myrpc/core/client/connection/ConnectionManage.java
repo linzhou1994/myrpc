@@ -89,7 +89,9 @@ public class ConnectionManage {
      * @return 可用的客户端连接
      */
     public Connection getConnection0(String address, int port) {
-        if (StringUtils.isBlank(address) || port <= 0) return null;
+        if (StringUtils.isBlank(address) || port <= 0) {
+            return null;
+        }
         String key = getConnectionKey(address, port);
         //通过key从缓存中获取连接
         Connection connection = address2Connection.get(key);

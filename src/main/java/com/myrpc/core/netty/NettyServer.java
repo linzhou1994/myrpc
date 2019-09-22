@@ -51,7 +51,9 @@ public class NettyServer {
 
     private static final Logger log = Logger.getLogger(NettyServer.class);
 
-    //服务端启动端口
+    /**
+     * 服务端启动端口
+     */
     private int port;
     /**
      * 状态
@@ -73,7 +75,9 @@ public class NettyServer {
     }
 
     public void start() throws InterruptedException {
-        if (bossGroup != null && workerGroup != null) return;
+        if (bossGroup != null && workerGroup != null) {
+            return;
+        }
         status = Status.STARTING;
         log.info("==============startServer=============");
         bossGroup = new NioEventLoopGroup(1);

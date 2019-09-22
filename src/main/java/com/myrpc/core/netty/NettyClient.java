@@ -90,7 +90,9 @@ public class NettyClient {
     }
 
     private void startClient0() throws InterruptedException {
-        if (eventLoopGroup != null) return;
+        if (eventLoopGroup != null){
+            return;
+        }
 
         log.info("==============startClient=============");
 
