@@ -1,14 +1,4 @@
-package com.myrpc.core.server.handler;
-
-import com.myrpc.core.client.ClientRequest;
-import com.myrpc.core.common.bo.MethodHandler;
-import com.myrpc.core.exception.ServerException;
-import com.myrpc.core.server.ServerResponse;
-import com.myrpc.core.server.container.ServiceContainerManager;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import org.apache.log4j.Logger;
-
+package com.myrpc.core.provider;
 
 /**
  * ////////////////////////////////////////////////////////////////////
@@ -43,34 +33,16 @@ import org.apache.log4j.Logger;
  * //                 不见满街漂亮妹，哪个归得程序员?                 //
  * ////////////////////////////////////////////////////////////////////
  *
- * @创建时间: 2019/9/22 0:06
+ * @创建时间: 2019/9/22 17:25
  * @author: linzhou
- * @描述: RpcServerHandler
+ * @描述: MyRpcProvider
  */
-public class RpcServerHandler extends SimpleChannelInboundHandler<ClientRequest> {
-    private static final Logger log = Logger.getLogger(RpcServerHandler.class);
+public interface MyRpcProvider {
 
-
-    @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, ClientRequest request) {
-        log.info("接收客户端的消息：" + request.toString());
-        ServerResponse response = new ServerResponse(request.getUuid());
-        MethodHandler methodHander = ServiceContainerManager.CONTAINER.getMethodHander(request.getClassNames());
-        if (methodHander != null) {
-            try {
-                Object rlt = methodHander.invoke(request.getParams());
-                response.setRlt(rlt);
-            } catch (Throwable e) {
-                e.printStackTrace();
-                response.setException(e);
-            }
-        } else {
-            Throwable e = new ServerException("No find service!Please register first!");
-            e.printStackTrace();
-            response.setException(e);
-        }
-
-        channelHandlerContext.channel().write(response);
-        channelHandlerContext.flush();
-    }
+    /**
+     * 想注册中心注册服务
+     *
+     * @param object 要注册的对象
+     */
+    void registered(Object object);
 }

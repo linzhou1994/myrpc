@@ -1,14 +1,8 @@
-package com.myrpc.core.server.handler;
+package com.myrpc.consumer;
 
 import com.myrpc.core.client.ClientRequest;
-import com.myrpc.core.common.bo.MethodHandler;
-import com.myrpc.core.exception.ServerException;
-import com.myrpc.core.server.ServerResponse;
-import com.myrpc.core.server.container.ServiceContainerManager;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import org.apache.log4j.Logger;
-
+import com.myrpc.core.common.bo.ServerInfo;
+import com.myrpc.core.consumer.MyRpcConsumer;
 
 /**
  * ////////////////////////////////////////////////////////////////////
@@ -43,34 +37,13 @@ import org.apache.log4j.Logger;
  * //                 不见满街漂亮妹，哪个归得程序员?                 //
  * ////////////////////////////////////////////////////////////////////
  *
- * @创建时间: 2019/9/22 0:06
+ * @创建时间: 2019/9/22 17:23
  * @author: linzhou
- * @描述: RpcServerHandler
+ * @描述: TestConsumer
  */
-public class RpcServerHandler extends SimpleChannelInboundHandler<ClientRequest> {
-    private static final Logger log = Logger.getLogger(RpcServerHandler.class);
-
-
+public class TestConsumer  implements MyRpcConsumer {
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, ClientRequest request) {
-        log.info("接收客户端的消息：" + request.toString());
-        ServerResponse response = new ServerResponse(request.getUuid());
-        MethodHandler methodHander = ServiceContainerManager.CONTAINER.getMethodHander(request.getClassNames());
-        if (methodHander != null) {
-            try {
-                Object rlt = methodHander.invoke(request.getParams());
-                response.setRlt(rlt);
-            } catch (Throwable e) {
-                e.printStackTrace();
-                response.setException(e);
-            }
-        } else {
-            Throwable e = new ServerException("No find service!Please register first!");
-            e.printStackTrace();
-            response.setException(e);
-        }
-
-        channelHandlerContext.channel().write(response);
-        channelHandlerContext.flush();
+    public ServerInfo getServerInfo(ClientRequest request) {
+        return new ServerInfo("127.0.0.1",8888);
     }
 }

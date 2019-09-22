@@ -1,14 +1,10 @@
-package com.myrpc.core.server.handler;
+package com.myrpc.utils;
 
-import com.myrpc.core.client.ClientRequest;
-import com.myrpc.core.common.bo.MethodHandler;
-import com.myrpc.core.exception.ServerException;
-import com.myrpc.core.server.ServerResponse;
-import com.myrpc.core.server.container.ServiceContainerManager;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+
 import org.apache.log4j.Logger;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 /**
  * ////////////////////////////////////////////////////////////////////
@@ -43,34 +39,64 @@ import org.apache.log4j.Logger;
  * //                 不见满街漂亮妹，哪个归得程序员?                 //
  * ////////////////////////////////////////////////////////////////////
  *
- * @创建时间: 2019/9/22 0:06
+ * @创建时间: 2019/9/22 17:46
  * @author: linzhou
- * @描述: RpcServerHandler
+ * @描述: ReflectionUtil
  */
-public class RpcServerHandler extends SimpleChannelInboundHandler<ClientRequest> {
-    private static final Logger log = Logger.getLogger(RpcServerHandler.class);
+public class ReflectionUtil {
+    private static final Logger LOGGER = Logger.getLogger(ReflectionUtil.class);
 
-
-    @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, ClientRequest request) {
-        log.info("接收客户端的消息：" + request.toString());
-        ServerResponse response = new ServerResponse(request.getUuid());
-        MethodHandler methodHander = ServiceContainerManager.CONTAINER.getMethodHander(request.getClassNames());
-        if (methodHander != null) {
-            try {
-                Object rlt = methodHander.invoke(request.getParams());
-                response.setRlt(rlt);
-            } catch (Throwable e) {
-                e.printStackTrace();
-                response.setException(e);
-            }
-        } else {
-            Throwable e = new ServerException("No find service!Please register first!");
-            e.printStackTrace();
-            response.setException(e);
+    /**
+     * 创建实例
+     */
+    public static Object newInstance(Class<?> cls) {
+        Object instance;
+        try {
+            instance = cls.newInstance();
+        } catch (Exception e) {
+            LOGGER.error("new instance failure", e);
+            throw new RuntimeException(e);
         }
+        return instance;
+    }
 
-        channelHandlerContext.channel().write(response);
-        channelHandlerContext.flush();
+    /**
+     * 创建实例（根据类名）
+     */
+    public static Object newInstance(String className) {
+        Class<?> cls = ClassUtil.loadClass(className);
+        return newInstance(cls);
+    }
+
+    /**
+     * 调用方法
+     */
+    public static Object invokeMethod(Object obj, Method method, Object... args) {
+        Object result;
+        try {
+            method.setAccessible(true);
+            result = method.invoke(obj, args);
+        } catch (Exception e) {
+            LOGGER.error("invoke method failure", e);
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    /**
+     * 设置某个对象的成员变量的值
+     *
+     * @param obj   要设置成员变量值的对象
+     * @param field 成员变量的field
+     * @param value 值
+     */
+    public static void setField(Object obj, Field field, Object value) {
+        try {
+            field.setAccessible(true);
+            field.set(obj, value);
+        } catch (Exception e) {
+            LOGGER.error("set field failure", e);
+            throw new RuntimeException(e);
+        }
     }
 }

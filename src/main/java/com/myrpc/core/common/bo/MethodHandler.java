@@ -1,14 +1,9 @@
-package com.myrpc.core.server.handler;
+package com.myrpc.core.common.bo;
 
-import com.myrpc.core.client.ClientRequest;
-import com.myrpc.core.common.bo.MethodHandler;
-import com.myrpc.core.exception.ServerException;
-import com.myrpc.core.server.ServerResponse;
-import com.myrpc.core.server.container.ServiceContainerManager;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import org.apache.log4j.Logger;
+import com.myrpc.utils.ReflectionUtil;
 
+import java.io.Serializable;
+import java.lang.reflect.Method;
 
 /**
  * ////////////////////////////////////////////////////////////////////
@@ -43,34 +38,53 @@ import org.apache.log4j.Logger;
  * //                 不见满街漂亮妹，哪个归得程序员?                 //
  * ////////////////////////////////////////////////////////////////////
  *
- * @创建时间: 2019/9/22 0:06
+ * @创建时间: 2019/9/22 17:43
  * @author: linzhou
- * @描述: RpcServerHandler
+ * @描述: MethodHandler
  */
-public class RpcServerHandler extends SimpleChannelInboundHandler<ClientRequest> {
-    private static final Logger log = Logger.getLogger(RpcServerHandler.class);
+public class MethodHandler implements Serializable {
 
+    /**
+     * 方法所在对象
+     */
+    private Object targ;
 
-    @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, ClientRequest request) {
-        log.info("接收客户端的消息：" + request.toString());
-        ServerResponse response = new ServerResponse(request.getUuid());
-        MethodHandler methodHander = ServiceContainerManager.CONTAINER.getMethodHander(request.getClassNames());
-        if (methodHander != null) {
-            try {
-                Object rlt = methodHander.invoke(request.getParams());
-                response.setRlt(rlt);
-            } catch (Throwable e) {
-                e.printStackTrace();
-                response.setException(e);
-            }
-        } else {
-            Throwable e = new ServerException("No find service!Please register first!");
-            e.printStackTrace();
-            response.setException(e);
+    /**
+     * 目标对象的类名和接口名称
+     */
+    private String[] clazzNames;
+    /**
+     * 方法名称
+     */
+    private Method method;
+
+    public MethodHandler(Object targ, Method method) {
+        if (targ == null || method == null) {
+            throw new IllegalArgumentException("targ or method cannot is null!");
         }
+        this.targ = targ;
+        this.method = method;
+        //获取targ的类名及所有实现接口的名称
+        Class targClass = targ.getClass();
+        Class[] interfaces = targClass.getInterfaces();
+        clazzNames = new String[interfaces.length + 1];
+        clazzNames[0] = targClass.getName();
+        for (int i = 0; i < interfaces.length; i++) {
+            clazzNames[i + 1] = interfaces[i].getName();
+        }
+    }
 
-        channelHandlerContext.channel().write(response);
-        channelHandlerContext.flush();
+    /**
+     * 执行方法
+     *
+     * @param args 参数
+     * @return
+     */
+    public Object invoke(Object... args) {
+        return ReflectionUtil.invokeMethod(targ, method, args);
+    }
+
+    public String[] getClazzNames() {
+        return clazzNames;
     }
 }
