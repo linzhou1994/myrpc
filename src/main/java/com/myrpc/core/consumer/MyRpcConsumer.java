@@ -35,9 +35,9 @@ import com.myrpc.core.common.bo.ServerInfo;
  * //                 别人笑我忒疯癫，我笑自己命太贱;                 //
  * //                 不见满街漂亮妹，哪个归得程序员?                 //
  * ////////////////////////////////////////////////////////////////////
- * 创建时间: 2019/9/22 0:16
- * 作者: linzhou
- * 描述: LoadBalancingStrategy负载均衡策略接口
+ * @创建时间: 2019/9/22 0:16
+ * @author: linzhou
+ * @描述: LoadBalancingStrategy负载均衡策略接口
  */
 public interface MyRpcConsumer {
 

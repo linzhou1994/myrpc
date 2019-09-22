@@ -42,9 +42,10 @@ import java.util.*;
  * //                 别人笑我忒疯癫，我笑自己命太贱;                 //
  * //                 不见满街漂亮妹，哪个归得程序员?                 //
  * ////////////////////////////////////////////////////////////////////
- * 创建时间: 2019/9/22 0:06
- * 作者: linzhou
- * 描述: NettyClient
+ *
+ * @创建时间: 2019/9/22 0:06
+ * @author: linzhou
+ * @描述: NettyClient
  */
 public class NettyClient {
     private static final Logger log = Logger.getLogger(NettyClient.class);
@@ -83,14 +84,14 @@ public class NettyClient {
             } catch (Throwable e) {
                 e.printStackTrace();
                 status = Status.EXCEPTION;
-            }finally {
+            } finally {
                 ConnectionManage.closeConnection(address, port);
             }
         }).start();
     }
 
     private void startClient0() throws InterruptedException {
-        if (eventLoopGroup != null){
+        if (eventLoopGroup != null) {
             return;
         }
 

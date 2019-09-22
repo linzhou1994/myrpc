@@ -43,9 +43,10 @@ import java.io.IOException;
  * //                 别人笑我忒疯癫，我笑自己命太贱;                 //
  * //                 不见满街漂亮妹，哪个归得程序员?                 //
  * ////////////////////////////////////////////////////////////////////
- * 创建时间: 2019/9/22 0:06
- * 作者: linzhou
- * 描述: ClientReques的编码类
+ *
+ * @创建时间: 2019/9/22 0:06
+ * @author: linzhou
+ * @描述: ClientReques的编码类
  */
 public class ClientRequestEncoder extends MessageToByteEncoder<ClientRequest> {
     private static final Logger log = Logger.getLogger(ClientRequestEncoder.class);

@@ -38,14 +38,15 @@ import java.util.List;
  * //                 别人笑我忒疯癫，我笑自己命太贱;                 //
  * //                 不见满街漂亮妹，哪个归得程序员?                 //
  * ////////////////////////////////////////////////////////////////////
- * 创建时间: 2019/9/22 0:06
- * 作者: linzhou
- * 描述: 序列化与反序列化工具类
+ *
+ * @创建时间: 2019/9/22 0:06
+ * @author: linzhou
+ * @描述: 序列化与反序列化工具类
  */
 public class Serializer {
     public static byte[] serialize(Object obj) throws IOException {
-        try(ByteArrayOutputStream b = new ByteArrayOutputStream()){
-            try(ObjectOutputStream o = new ObjectOutputStream(b)){
+        try (ByteArrayOutputStream b = new ByteArrayOutputStream()) {
+            try (ObjectOutputStream o = new ObjectOutputStream(b)) {
                 o.writeObject(obj);
             }
             return b.toByteArray();
@@ -53,8 +54,8 @@ public class Serializer {
     }
 
     public static Object deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
-        try(ByteArrayInputStream b = new ByteArrayInputStream(bytes)){
-            try(ObjectInputStream o = new ObjectInputStream(b)){
+        try (ByteArrayInputStream b = new ByteArrayInputStream(bytes)) {
+            try (ObjectInputStream o = new ObjectInputStream(b)) {
                 return o.readObject();
             }
         }

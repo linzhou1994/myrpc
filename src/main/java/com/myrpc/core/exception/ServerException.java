@@ -32,9 +32,10 @@ package com.myrpc.core.exception;
  * //                 别人笑我忒疯癫，我笑自己命太贱;                 //
  * //                 不见满街漂亮妹，哪个归得程序员?                 //
  * ////////////////////////////////////////////////////////////////////
- * 创建时间: 2019/9/22 0:29
- * 作者: linzhou
- * 描述: ServerException
+ *
+ * @创建时间: 2019/9/22 0:29
+ * @author: linzhou
+ * @描述: ServerException
  */
 public class ServerException extends Exception {
 
