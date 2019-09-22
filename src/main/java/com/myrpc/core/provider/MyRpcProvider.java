@@ -43,6 +43,7 @@ public interface MyRpcProvider {
      * 想注册中心注册服务
      *
      * @param object 要注册的对象
+     * @throws Exception
      */
     void registered(Object object) throws Exception;
 }

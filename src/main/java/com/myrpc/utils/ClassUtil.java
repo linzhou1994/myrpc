@@ -92,13 +92,13 @@ public class ClassUtil {
                 URL url = urls.nextElement();
                 if (url != null) {
                     String protocol = url.getProtocol();
-                    if (protocol.equals("file")) {
+                    if ("file".equals(protocol)) {
                         String packagePath = url.getPath().replaceAll("%20", " ");
                         addClass(classSet, packagePath, packageName);
-                    } else if (protocol.equals("jar")) {
-                        JarURLConnection jarURLConnection = (JarURLConnection) url.openConnection();
-                        if (jarURLConnection != null) {
-                            JarFile jarFile = jarURLConnection.getJarFile();
+                    } else if ("jar".equals(protocol)) {
+                        JarURLConnection jarUrlConnection = (JarURLConnection) url.openConnection();
+                        if (jarUrlConnection != null) {
+                            JarFile jarFile = jarUrlConnection.getJarFile();
                             if (jarFile != null) {
                                 Enumeration<JarEntry> jarEntries = jarFile.entries();
                                 while (jarEntries.hasMoreElements()) {
@@ -123,6 +123,7 @@ public class ClassUtil {
 
     private static void addClass(Set<Class<?>> classSet, String packagePath, String packageName) {
         File[] files = new File(packagePath).listFiles(new FileFilter() {
+            @Override
             public boolean accept(File file) {
                 return (file.isFile() && file.getName().endsWith(".class")) || file.isDirectory();
             }
