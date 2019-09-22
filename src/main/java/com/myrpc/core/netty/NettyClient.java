@@ -66,6 +66,8 @@ public class NettyClient {
 
     private List<ChannelHandler> childHandlerList;
 
+    private Thread clientMainThread;
+
     public NettyClient(String address, int port) {
         this.address = address;
         this.port = port;
@@ -78,7 +80,7 @@ public class NettyClient {
 
     public void startClient() {
         status = Status.STARTING;
-        new Thread(() -> {
+        clientMainThread = new Thread(() -> {
             try {
                 startClient0();
             } catch (Throwable e) {
@@ -87,7 +89,8 @@ public class NettyClient {
             } finally {
                 ConnectionManage.closeConnection(address, port);
             }
-        }).start();
+        });
+        clientMainThread.start();
     }
 
     private void startClient0() throws InterruptedException {
