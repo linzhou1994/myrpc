@@ -45,11 +45,12 @@ public class ClientStart {
     public static void main(String[] args) {
         ClientProxyConfig clientProxyConfig = new ClientProxyConfig();
         clientProxyConfig.setRetryCount(2);
-        JavaClientProxy proxy = new JavaClientProxy(clientProxyConfig, new Class[]{Test.class}, new TestConsumer());
-        Test test = (Test) proxy.newProxyInstance();
-        System.out.println("===================================");
+        JavaClientProxy proxy = new JavaClientProxy();
+        Test test = proxy.newProxyInstance(Test.class,clientProxyConfig,new TestConsumer());
         System.out.println(test.testString("test"));
-        System.out.println("===================================");
         test.testVoid();
+        Test2 test2 = proxy.newProxyInstance(Test2.class,clientProxyConfig,new TestConsumer());
+        System.out.println(test2.testString());
+        test2.testVoid();
     }
 }

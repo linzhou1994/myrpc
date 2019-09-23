@@ -66,7 +66,7 @@ public class ClientRequest implements Serializable {
     /**
      * 请求类名称
      */
-    private String[] classNames;
+    private String className;
     /**
      * 请求方法
      */
@@ -100,9 +100,10 @@ public class ClientRequest implements Serializable {
         return timeOut;
     }
 
-    public String[] getClassNames() {
-        return classNames;
+    public String getClassName() {
+        return className;
     }
+
 
     public String getMethodName() {
         return methodName;
@@ -131,8 +132,8 @@ public class ClientRequest implements Serializable {
         return this;
     }
 
-    public ClientRequest setClassNames(String[] classNames) {
-        this.classNames = classNames;
+    public ClientRequest setClassName(String className) {
+        this.className = className;
         return this;
     }
 
@@ -158,7 +159,7 @@ public class ClientRequest implements Serializable {
                 ", response=" + response +
                 ", retryCount=" + retryCount +
                 ", timeOut=" + timeOut +
-                ", classNames=" + Arrays.toString(classNames) +
+                ", classNames=" + className +
                 ", methodName='" + methodName + '\'' +
                 ", params=" + Arrays.toString(params) +
                 '}';

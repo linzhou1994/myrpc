@@ -59,6 +59,7 @@ public class ServiceContainerManager {
 
     /**
      * 将对象加入到方法容器中
+     *
      * @param object
      * @throws Exception
      */
@@ -71,13 +72,13 @@ public class ServiceContainerManager {
             for (Method method : methods) {
                 String methodName = method.getName();
                 Class<?>[] parameterTypes = method.getParameterTypes();
-                Method objectMethod = clazz.getMethod(methodName,parameterTypes);
+                Method objectMethod = clazz.getMethod(methodName, parameterTypes);
                 methodSet.add(objectMethod);
             }
         }
 
         methodSet.forEach(method -> {
-            MethodHandler methodHandler = new MethodHandler(object,method);
+            MethodHandler methodHandler = new MethodHandler(object, method);
             registered(methodHandler);
         });
     }
@@ -100,28 +101,23 @@ public class ServiceContainerManager {
         }
     }
 
-    public MethodHandler getMethodHander(String[] classNames,String methodName,String[] paramClassNames) {
+    public MethodHandler getMethodHander(String className, String methodName, String[] paramClassNames) {
         MethodHandler rlt;
-        Set<String> keys = getMethodHandlerKeys(classNames, methodName, paramClassNames);
-        for (String key : keys) {
-            rlt = methodContainer.get(key);
-            if (rlt != null) {
-                return rlt;
-            }
-        }
-        return null;
+        String key = getMethodHanderKey(className, methodName, paramClassNames);
+        rlt = methodContainer.get(key);
+        return rlt;
     }
 
     private Set<String> getMethodHandlerKeys(String[] classNames, String methodName, String[] paramClassNames) {
         Set<String> keys = new HashSet<>();
         for (String className : classNames) {
-            keys.add(getMethodHanderKey(className,methodName,paramClassNames));
+            keys.add(getMethodHanderKey(className, methodName, paramClassNames));
         }
         return keys;
     }
 
 
-    private String getMethodHanderKey(String className,String methodName,String[] paramClassNames){
+    private String getMethodHanderKey(String className, String methodName, String[] paramClassNames) {
         StringBuilder keySb = new StringBuilder();
         keySb.append(className).append("&").append(methodName).append("&");
         for (String paramClassName : paramClassNames) {

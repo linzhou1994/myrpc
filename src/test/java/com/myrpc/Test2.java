@@ -1,10 +1,4 @@
-package com.myrpc.core.common.bo;
-
-import com.myrpc.utils.ReflectionUtil;
-import org.apache.log4j.Logger;
-
-import java.io.Serializable;
-import java.lang.reflect.Method;
+package com.myrpc;
 
 /**
  * ////////////////////////////////////////////////////////////////////
@@ -39,69 +33,12 @@ import java.lang.reflect.Method;
  * //                 不见满街漂亮妹，哪个归得程序员?                 //
  * ////////////////////////////////////////////////////////////////////
  *
- * @创建时间: 2019/9/22 17:43
+ * @创建时间: 2019/9/23 21:45
  * @author: linzhou
- * @描述: MethodHandler
+ * @描述: Test2
  */
-public class MethodHandler implements Serializable {
-    private static final Logger log = Logger.getLogger(MethodHandler.class);
+public interface Test2 {
+    String testString();
 
-    /**
-     * 方法所在对象
-     */
-    private Object targ;
-
-    /**
-     * 目标对象的类名和接口名称
-     */
-    private String[] clazzNames;
-    /**
-     * 方法名称
-     */
-    private Method method;
-
-    private String methodName;
-
-    private String[] parameterClassNames;
-
-    public MethodHandler(Object targ, Method method) {
-        if (targ == null || method == null) {
-            throw new IllegalArgumentException("targ or method cannot is null!");
-        }
-        this.targ = targ;
-        this.method = method;
-        //获取targ的类名及所有实现接口的名称
-        Class targClass = targ.getClass();
-        Class[] interfaces = targClass.getInterfaces();
-        clazzNames = new String[interfaces.length];
-        for (int i = 0; i < interfaces.length; i++) {
-            clazzNames[i] = interfaces[i].getName();
-        }
-        //获取方法的所有参数类型
-        parameterClassNames = ReflectionUtil.getMethodParameterTypeNames(this.method);
-        methodName = method.getName();
-    }
-
-
-    public String[] getParameterClassNames() {
-        return parameterClassNames;
-    }
-
-    public String getMethodName() {
-        return methodName;
-    }
-
-    /**
-     * 执行方法
-     *
-     * @param args 参数
-     * @return
-     */
-    public Object invoke(Object... args) {
-        return ReflectionUtil.invokeMethod(targ, method, args);
-    }
-
-    public String[] getClazzNames() {
-        return clazzNames;
-    }
+    void testVoid();
 }

@@ -37,7 +37,7 @@ package com.myrpc;
  * @author: linzhou
  * @描述: Test
  */
-public interface Test {
+public interface Test{
     String testString(String str);
 
     void testVoid();

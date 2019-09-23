@@ -55,7 +55,7 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<ClientRequest>
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, ClientRequest request) {
         log.info("接收客户端的消息：" + request.toString());
         ServerResponse response = new ServerResponse(request.getUuid());
-        MethodHandler methodHander = ServiceContainerManager.CONTAINER.getMethodHander(request.getClassNames(),
+        MethodHandler methodHander = ServiceContainerManager.CONTAINER.getMethodHander(request.getClassName(),
                 request.getMethodName(),
                 request.getParameterClassNames());
         if (methodHander != null) {

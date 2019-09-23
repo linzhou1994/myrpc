@@ -140,11 +140,16 @@ public class ClientConnectionHandler extends SimpleChannelInboundHandler<ServerR
                 while (retryCount-- >= 0 && clientRequest.getResponse() == null && client.isUsable()) {
 
                     if (ctx != null) {
+                        //如果已经与服务端建立通讯
                         ctx.writeAndFlush(clientRequest);
+                        //等待服务端响应
+                        clientRequest.wait(timeOut);
+                    } else if (retryCount >= 0) {
+                        //如果没有与服务端建立通讯，但是还有重试的机会，则等待一段时间
+                        clientRequest.wait(timeOut);
                     }
 
-                    //等待服务端响应
-                    clientRequest.wait(timeOut);
+
                 }
 
                 return clientRequest.getResponse();
@@ -167,8 +172,8 @@ public class ClientConnectionHandler extends SimpleChannelInboundHandler<ServerR
         if (clientRequest.getTimeOut() <= 0) {
             sb.append("timeOut must be greater than 0;");
         }
-        String[] classNames = clientRequest.getClassNames();
-        if (classNames == null || classNames.length == 0) {
+        String className = clientRequest.getClassName();
+        if (StringUtils.isBlank(className)) {
             sb.append("className cannot be empty;");
         }
         if (StringUtils.isBlank(clientRequest.getMethodName())) {

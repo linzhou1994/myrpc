@@ -39,17 +39,29 @@ import org.apache.log4j.Logger;
  * @author: linzhou
  * @描述: TestImpl
  */
-public class TestImpl implements Test {
+public class TestImpl implements Test,Test2 {
     private static final Logger log = Logger.getLogger(TestImpl.class);
 
     @Override
     public String testString(String str) {
-        log.info("==================testString=======================");
+        log.info("==================testString(String str)=======================");
         return "testString" + str;
+    }
+
+    @Override
+    public String testString() {
+        log.info("==================testString()=======================");
+        return "testString";
     }
 
     @Override
     public void testVoid() {
         log.info("==================testVoid=======================");
+    }
+
+    public static void main(String[] args) {
+        for (Class<?> aClass : TestImpl.class.getInterfaces()) {
+            System.out.println(aClass.getName());
+        }
     }
 }

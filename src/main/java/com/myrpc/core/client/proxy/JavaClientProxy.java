@@ -60,34 +60,27 @@ public class JavaClientProxy implements InvocationHandler {
 
     private ClientProxyConfig config;
 
-    private Class[] clazzs;
+    private Class clazz;
 
-    private String[] classNames;
+    private String className;
 
     private MyRpcConsumer strategy;
 
-    public JavaClientProxy(Class[] clazzs, MyRpcConsumer strategy) {
-        this.strategy = strategy;
-        this.clazzs = clazzs;
-        classNames = new String[this.clazzs.length];
-        for (int i = 0; i < clazzs.length; i++) {
-            classNames[i] = this.clazzs[i].getName();
-        }
-
+    public JavaClientProxy() {
     }
 
-    public JavaClientProxy(ClientProxyConfig config, Class[] clazzs, MyRpcConsumer strategy) {
-        this(clazzs, strategy);
+
+
+    public <T> T newProxyInstance(Class clazz,ClientProxyConfig config, MyRpcConsumer strategy) {
+        setClazz(clazz);
         this.config = config;
-    }
-
-    public Object newProxyInstance() {
-        return Proxy.newProxyInstance(this.getClass().getClassLoader(), clazzs, this);
+        this.strategy = strategy;
+        return (T) Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class[]{this.clazz}, this);
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        ClientRequest request = createClientRequest(config, classNames, method, args);
+        ClientRequest request = createClientRequest(config, className, method, args);
         if (strategy == null) {
             throw new IllegalArgumentException("MyRpcConsumer cannot is null!");
         }
@@ -112,9 +105,14 @@ public class JavaClientProxy implements InvocationHandler {
         return response.getRlt();
     }
 
-    private ClientRequest createClientRequest(ClientProxyConfig config, String[] classNames, Method method, Object[] args) {
+    private void setClazz(Class clazz) {
+        this.clazz = clazz;
+        className = clazz.getName();
+    }
+
+    private ClientRequest createClientRequest(ClientProxyConfig config, String className, Method method, Object[] args) {
         ClientRequest request = new ClientRequest();
-        request.setClassNames(classNames)
+        request.setClassName(className)
                 .setMethodName(method.getName())
                 .setParams(args)
                 .setParameterClassNames(ReflectionUtil.getMethodParameterTypeNames(method));

@@ -1,9 +1,7 @@
 package com.myrpc.core.client.connection;
 
 
-import com.myrpc.core.client.ClientRequest;
 import com.myrpc.core.common.bo.ServerInfo;
-import com.myrpc.core.server.ServerResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -96,7 +94,6 @@ public class ConnectionManage {
         String key = getConnectionKey(address, port);
         //通过key从缓存中获取连接
         Connection connection = address2Connection.get(key);
-        log.info("================getConnection0 key:" + key + " connection:" + connection);
         //如果没有拿到连接或者连接不可用则创建一个新的连接
         if (connection == null || !connection.isUsable()) {
             synchronized (key.intern()) {
@@ -141,34 +138,6 @@ public class ConnectionManage {
         return address + "." + port;
     }
 
-
-    public static void main(String[] args) throws InterruptedException {
-        sendMsg("127.0.0.1", 8888);
-        sendMsg("127.0.0.1", 8888);
-        sendMsg("127.0.0.1", 8880);
-
-
-    }
-
-    private static void sendMsg(String address, int port) throws InterruptedException {
-        ServerInfo serverInfo = new ServerInfo(address, port);
-        Connection connection = ConnectionManage.getConnection(serverInfo);
-        log.info("==========================getConnection");
-        if (connection != null) {
-            Thread.sleep(3000);
-            ClientRequest request = new ClientRequest();
-            request.setClassNames(new String[]{"className"}).setMethodName("method");
-            ServerResponse response = connection.sendMsg(request);
-            log.info("==========================response1:" + response);
-            request = new ClientRequest();
-            request.setClassNames(new String[]{"className"}).setMethodName("method");
-            response = connection.sendMsg(request);
-            log.info("==========================response2:" + response);
-
-        } else {
-            log.info("==========================connection is null");
-        }
-    }
 
 
 }

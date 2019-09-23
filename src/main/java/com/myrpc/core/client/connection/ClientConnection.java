@@ -57,20 +57,16 @@ public class ClientConnection implements Connection {
     private ClientConnectionHandler connectionHandler;
 
     public static ClientConnection createServerConnection(String address, int port) {
-        try {
-            return new ClientConnection(address, port);
-        } catch (InterruptedException e) {
-            return null;
-        }
+        return new ClientConnection(address, port);
     }
 
 
-    private ClientConnection(String address, int port) throws InterruptedException {
+    private ClientConnection(String address, int port) {
         createConnection(address, port);
     }
 
-    private void createConnection(String address, int port) throws InterruptedException {
-        log.info("==============createConnection==================");
+    private void createConnection(String address, int port) {
+        log.info("==============createConnection address" + address + " port:" + port + "==================");
         client = new NettyClient(address, port);
         List<ChannelHandler> channelHandlerList = getServerChannelHandlerList();
         client.setChildHandlerList(channelHandlerList);

@@ -84,9 +84,5 @@ public class RpcServer {
         return handlerClassList;
     }
 
-    public static void main(String[] args) {
-        RpcServer server = new RpcServer(8888);
-        server.startServer();
-    }
 
 }
