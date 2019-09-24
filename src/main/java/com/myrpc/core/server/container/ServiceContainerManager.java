@@ -88,7 +88,7 @@ public class ServiceContainerManager {
      *
      * @param methodHandler
      */
-    public void registered(MethodHandler methodHandler) {
+    private void registered(MethodHandler methodHandler) {
         String[] classNames = methodHandler.getClazzNames();
         String[] parameterClassNames = methodHandler.getParameterClassNames();
         Set<String> keys = getMethodHandlerKeys(classNames, methodHandler.getMethodName(), parameterClassNames);
