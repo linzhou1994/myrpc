@@ -113,6 +113,9 @@ public class ClientConnectionHandler extends SimpleChannelInboundHandler<ServerR
                 ctx.close();
             } else {
                 this.ctx = ctx;
+                synchronized (this) {
+                    this.notifyAll();
+                }
             }
         }
 
@@ -137,21 +140,22 @@ public class ClientConnectionHandler extends SimpleChannelInboundHandler<ServerR
                 int retryCount = clientRequest.getRetryCount();
                 long timeOut = clientRequest.getTimeOut();
                 //如果重试次数没有小于0并且未收到服务端的返回并且客户端连接依然可用，则重试向服务端发送消息
-                while (retryCount-- >= 0 && clientRequest.getResponse() == null && client.isUsable()) {
+                while (retryCount-- >= 0 && clientRequest.getResponse() == null && client.isUsable() && !needClose) {
 
                     if (ctx != null) {
                         //如果已经与服务端建立通讯
                         ctx.writeAndFlush(clientRequest);
                         //等待服务端响应
                         clientRequest.wait(timeOut);
-                    } else if (retryCount >= 0) {
+                    } else if (retryCount >= 0 && !needClose) {
                         //如果没有与服务端建立通讯，但是还有重试的机会，则等待一段时间
-                        clientRequest.wait(timeOut);
+                        synchronized (this) {
+                            if (ctx == null && !needClose) {
+                                this.wait(timeOut);
+                            }
+                        }
                     }
-
-
                 }
-
                 return clientRequest.getResponse();
             }
         } finally {
@@ -188,24 +192,18 @@ public class ClientConnectionHandler extends SimpleChannelInboundHandler<ServerR
         return requestParamMap.get(key);
     }
 
-    /**
-     * 当前连接是否活跃
-     *
-     * @return
-     */
-    public boolean isActivity() {
-        return ctx != null;
-    }
 
     /**
      * 关闭当前客户端与服务端的连接
      */
     public void close() {
-        synchronized (needClose) {
-            if (isActivity()) {
-                ctx.close();
-            } else {
+        if (!needClose) {
+            synchronized (needClose) {
                 needClose = true;
+
+                if (ctx != null) {
+                    ctx.close();
+                }
             }
         }
     }

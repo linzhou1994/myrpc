@@ -2,10 +2,12 @@ package com.myrpc.core.client.connection;
 
 import com.myrpc.core.client.ClientRequest;
 import com.myrpc.core.client.handler.ClientConnectionHandler;
+import com.myrpc.core.common.bo.ServerInfo;
 import com.myrpc.core.common.handler.core.DefaultDecoder;
 import com.myrpc.core.common.handler.core.ClientRequestEncoder;
 import com.myrpc.core.netty.NettyClient;
 import com.myrpc.core.server.ServerResponse;
+import com.sun.istack.internal.NotNull;
 import io.netty.channel.ChannelHandler;
 import org.apache.log4j.Logger;
 
@@ -56,21 +58,20 @@ public class ClientConnection implements Connection {
 
     private ClientConnectionHandler connectionHandler;
 
-    public static ClientConnection createServerConnection(String address, int port) {
-        return new ClientConnection(address, port);
+    public static ClientConnection createClientConnection(@NotNull ServerInfo serverInfo) {
+        return new ClientConnection(serverInfo);
     }
 
 
-    private ClientConnection(String address, int port) {
-        createConnection(address, port);
+    private ClientConnection(@NotNull ServerInfo serverInfo) {
+        createConnection(serverInfo);
     }
 
-    private void createConnection(String address, int port) {
-        log.info("==============createConnection address" + address + " port:" + port + "==================");
-        client = new NettyClient(address, port);
+    private void createConnection(ServerInfo serverInfo) {
+        log.info("==============createConnection address" + serverInfo.getAddress() + " port:" + serverInfo.getPort() + "==================");
+        client = new NettyClient(serverInfo);
         List<ChannelHandler> channelHandlerList = getServerChannelHandlerList();
         client.setChildHandlerList(channelHandlerList);
-        client.startClient();
     }
 
     private List<ChannelHandler> getServerChannelHandlerList() {
@@ -127,5 +128,10 @@ public class ClientConnection implements Connection {
     @Override
     public void close() {
         connectionHandler.close();
+    }
+
+    @Override
+    public void run() {
+        client.startClient();
     }
 }

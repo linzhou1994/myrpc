@@ -43,7 +43,7 @@ public enum Status {
     //启动中
     STARTING,
     //已启动
-    START,
+    RUNNING,
     //已停止运行
     DEAD,
     //发生异常

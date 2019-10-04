@@ -40,7 +40,7 @@ import com.myrpc.core.server.ServerResponse;
  * @author: linzhou
  * @描述: 客户端连接接口
  */
-public interface Connection {
+public interface Connection extends Runnable{
 
     /**
      * 向服务端发送消息

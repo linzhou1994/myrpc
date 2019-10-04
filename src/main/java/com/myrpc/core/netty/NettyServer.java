@@ -109,7 +109,7 @@ public class NettyServer {
                     });
 
             ChannelFuture f = b.bind(port).sync();
-            status = Status.START;
+            status = Status.RUNNING;
             f.channel().closeFuture().sync();
             status = Status.DEAD;
         } catch (Throwable e) {

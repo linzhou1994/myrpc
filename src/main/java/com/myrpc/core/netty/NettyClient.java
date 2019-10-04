@@ -1,6 +1,7 @@
 package com.myrpc.core.netty;
 
 import com.myrpc.core.client.connection.ConnectionManage;
+import com.myrpc.core.common.bo.ServerInfo;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -50,13 +51,10 @@ import java.util.*;
 public class NettyClient {
     private static final Logger log = Logger.getLogger(NettyClient.class);
     /**
-     * 服务端ip地址
+     * 服务端信息
      */
-    private String address;
-    /**
-     * 服务端启动端口
-     */
-    private int port;
+    private ServerInfo serverInfo;
+
     /**
      * 状态
      */
@@ -66,11 +64,10 @@ public class NettyClient {
 
     private List<ChannelHandler> childHandlerList;
 
-    private Thread clientMainThread;
 
-    public NettyClient(String address, int port) {
-        this.address = address;
-        this.port = port;
+
+    public NettyClient(ServerInfo serverInfo) {
+        this.serverInfo = serverInfo;
         status = Status.NEW;
     }
 
@@ -80,17 +77,14 @@ public class NettyClient {
 
     public void startClient() {
         status = Status.STARTING;
-        clientMainThread = new Thread(() -> {
             try {
                 startClient0();
             } catch (Throwable e) {
                 e.printStackTrace();
                 status = Status.EXCEPTION;
             } finally {
-                ConnectionManage.closeConnection(address, port);
+                ConnectionManage.closeConnection(serverInfo);
             }
-        });
-        clientMainThread.start();
     }
 
     private void startClient0() throws InterruptedException {
@@ -120,8 +114,8 @@ public class NettyClient {
             }
         });
 
-        ChannelFuture channelFuture = bootstrap.connect(address, port).sync();
-        status = Status.START;
+        ChannelFuture channelFuture = bootstrap.connect(serverInfo.getAddress(), serverInfo.getPort()).sync();
+        status = Status.RUNNING;
         channelFuture.channel().closeFuture().sync();
         status = Status.DEAD;
     }
@@ -136,6 +130,6 @@ public class NettyClient {
      * @return
      */
     public boolean isUsable() {
-        return status == Status.NEW || status == Status.STARTING || status == Status.START;
+        return status == Status.NEW || status == Status.STARTING || status == Status.RUNNING;
     }
 }

@@ -2,11 +2,14 @@ package com.myrpc.core.client.connection;
 
 
 import com.myrpc.core.common.bo.ServerInfo;
+import com.sun.istack.internal.NotNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * ////////////////////////////////////////////////////////////////////
@@ -53,6 +56,8 @@ public class ConnectionManage {
 
     private Map<String, Connection> address2Connection = new ConcurrentHashMap<>();
 
+    private ExecutorService connetionExecutor = Executors.newCachedThreadPool();
+
     private ConnectionManage() {
     }
 
@@ -62,8 +67,8 @@ public class ConnectionManage {
      * @param serverInfo 服务器信息
      * @return 一个可用的服务器连接
      */
-    public static Connection getConnection(ServerInfo serverInfo) {
-        return CONNECTION_MANAGE.getConnection0(serverInfo.getAddress(), serverInfo.getPort());
+    public static Connection getConnection(@NotNull ServerInfo serverInfo) {
+        return CONNECTION_MANAGE.getConnection0(serverInfo);
     }
 
     /**
@@ -71,36 +76,32 @@ public class ConnectionManage {
      *
      * @param serverInfo 服务器信息
      */
-    public static void closeConnection(ServerInfo serverInfo) {
-        closeConnection(serverInfo.getAddress(), serverInfo.getPort());
-    }
-
-    public static void closeConnection(String address, int port) {
-        String key = getConnectionKey(address, port);
+    public static void closeConnection(@NotNull ServerInfo serverInfo) {
+        String key = getConnectionKey(serverInfo);
         CONNECTION_MANAGE.closeConnection(key);
     }
 
     /**
      * 通过服务器ip和端口获取连接
      *
-     * @param address 服务器ip
-     * @param port    端口
+     * @param serverInfo 服务器信息
      * @return 可用的客户端连接
      */
-    public Connection getConnection0(String address, int port) {
-        if (StringUtils.isBlank(address) || port <= 0) {
+    public Connection getConnection0(ServerInfo serverInfo) {
+        if (StringUtils.isBlank(serverInfo.getAddress()) || serverInfo.getPort() <= 0) {
             return null;
         }
-        String key = getConnectionKey(address, port);
+        String key = getConnectionKey(serverInfo);
         //通过key从缓存中获取连接
         Connection connection = address2Connection.get(key);
         //如果没有拿到连接或者连接不可用则创建一个新的连接
         if (connection == null || !connection.isUsable()) {
             synchronized (key.intern()) {
                 if (connection == null || !connection.isUsable()) {
-                    connection = ClientConnection.createServerConnection(address, port);
+                    connection = ClientConnection.createClientConnection(serverInfo);
                     if (connection.isUsable()) {
                         address2Connection.put(key, connection);
+                        connetionExecutor.execute(connection);
                     } else {
                         closeConnection(key);
                     }
@@ -130,14 +131,12 @@ public class ConnectionManage {
     /**
      * 通过服务器ip地址和端口获取客户端连接的缓存key
      *
-     * @param address 服务器ip地址
-     * @param port    端口
+     * @param serverInfo 服务器信息
      * @return key
      */
-    private static String getConnectionKey(String address, int port) {
-        return address + "." + port;
+    private static String getConnectionKey(ServerInfo serverInfo) {
+        return serverInfo.getAddress() + "." + serverInfo.getPort();
     }
-
 
 
 }

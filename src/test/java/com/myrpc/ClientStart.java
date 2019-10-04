@@ -2,7 +2,9 @@ package com.myrpc;
 
 import com.myrpc.consumer.TestConsumer;
 import com.myrpc.core.client.config.ClientProxyConfig;
+import com.myrpc.core.client.connection.ConnectionManage;
 import com.myrpc.core.client.proxy.JavaClientProxy;
+import com.myrpc.core.common.bo.ServerInfo;
 
 /**
  * ////////////////////////////////////////////////////////////////////
@@ -52,5 +54,7 @@ public class ClientStart {
         Test2 test2 = proxy.newProxyInstance(Test2.class,clientProxyConfig,new TestConsumer());
         System.out.println(test2.testString());
         test2.testVoid();
+        ServerInfo serverInfo = new ServerInfo("127.0.0.1",8888);
+        ConnectionManage.closeConnection(serverInfo);
     }
 }
