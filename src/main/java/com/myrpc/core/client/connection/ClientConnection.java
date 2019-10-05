@@ -6,6 +6,8 @@ import com.myrpc.core.common.bo.ServerInfo;
 import com.myrpc.core.common.handler.core.DefaultDecoder;
 import com.myrpc.core.common.handler.core.ClientRequestEncoder;
 import com.myrpc.core.netty.NettyClient;
+import com.myrpc.core.netty.Status;
+import com.myrpc.core.netty.listnner.ClientStatusChangeListnner;
 import com.myrpc.core.server.ServerResponse;
 import com.sun.istack.internal.NotNull;
 import io.netty.channel.ChannelHandler;
@@ -58,21 +60,22 @@ public class ClientConnection implements Connection {
 
     private ClientConnectionHandler connectionHandler;
 
-    public static ClientConnection createClientConnection(@NotNull ServerInfo serverInfo) {
-        return new ClientConnection(serverInfo);
+    public static ClientConnection createClientConnection(@NotNull ServerInfo serverInfo, ClientStatusChangeListnner statusChangeListnner) {
+        return new ClientConnection(serverInfo, statusChangeListnner);
     }
 
 
-    private ClientConnection(@NotNull ServerInfo serverInfo) {
-        createConnection(serverInfo);
-    }
-
-    private void createConnection(ServerInfo serverInfo) {
+    private ClientConnection(@NotNull ServerInfo serverInfo, ClientStatusChangeListnner statusChangeListnner) {
         log.info("==============createConnection address" + serverInfo.getAddress() + " port:" + serverInfo.getPort() + "==================");
+
         client = new NettyClient(serverInfo);
+        client.setStatusChangeListnner(statusChangeListnner);
+
+        //获取编码解码及业务逻辑处理hander
         List<ChannelHandler> channelHandlerList = getServerChannelHandlerList();
         client.setChildHandlerList(channelHandlerList);
     }
+
 
     private List<ChannelHandler> getServerChannelHandlerList() {
         List<ChannelHandler> handlerList = new ArrayList<>();
@@ -123,6 +126,11 @@ public class ClientConnection implements Connection {
     @Override
     public boolean isUsable() {
         return client.isUsable();
+    }
+
+    @Override
+    public Status getStatus() {
+        return client.getStatus();
     }
 
     @Override

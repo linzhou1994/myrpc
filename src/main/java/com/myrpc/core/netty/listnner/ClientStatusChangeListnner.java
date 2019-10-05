@@ -1,4 +1,7 @@
-package com.myrpc.core.netty;
+package com.myrpc.core.netty.listnner;
+
+import com.myrpc.core.common.bo.ServerInfo;
+import com.myrpc.core.netty.Status;
 
 /**
  * ////////////////////////////////////////////////////////////////////
@@ -33,19 +36,17 @@ package com.myrpc.core.netty;
  * //                 不见满街漂亮妹，哪个归得程序员?                 //
  * ////////////////////////////////////////////////////////////////////
  *
- * @创建时间: 2019/9/22 0:06
+ * @创建时间: 2019/10/5 22:24
  * @author: linzhou
- * @描述: NettyClient状态
+ * @描述: ClientStatusChangeListnner
  */
-public enum Status {
-    //创建状态
-    NEW,
-    //启动中
-    STARTING,
-    //已启动
-    RUNNING,
-    //已关闭
-    CLOSE,
-    //发生异常
-    EXCEPTION
+public interface ClientStatusChangeListnner {
+
+    /**
+     * nettyClient 状态改变监听
+     *
+     * @param serverInfo 连接的服务器
+     * @param newStatu   当前最新状态
+     */
+    void statusChange(ServerInfo serverInfo, Status newStatu);
 }

@@ -1,6 +1,7 @@
 package com.myrpc.core.client.connection;
 
 import com.myrpc.core.client.ClientRequest;
+import com.myrpc.core.netty.Status;
 import com.myrpc.core.server.ServerResponse;
 
 /**
@@ -40,7 +41,7 @@ import com.myrpc.core.server.ServerResponse;
  * @author: linzhou
  * @描述: 客户端连接接口
  */
-public interface Connection extends Runnable{
+public interface Connection extends Runnable {
 
     /**
      * 向服务端发送消息
@@ -51,11 +52,16 @@ public interface Connection extends Runnable{
     ServerResponse sendMsg(ClientRequest request);
 
     /**
-     * 当前连接是否活跃
+     * 当前连接是否可用
      *
      * @return
      */
     boolean isUsable();
+
+    /**
+     * @return 当前连接的状态
+     */
+    Status getStatus();
 
     /**
      * 关闭当前连接

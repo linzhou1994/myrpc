@@ -2,6 +2,8 @@ package com.myrpc.core.client.connection;
 
 
 import com.myrpc.core.common.bo.ServerInfo;
+import com.myrpc.core.netty.Status;
+import com.myrpc.core.netty.listnner.ClientStatusChangeListnner;
 import com.sun.istack.internal.NotNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -54,8 +56,28 @@ public class ConnectionManage {
 
     private static final ConnectionManage CONNECTION_MANAGE = new ConnectionManage();
 
-    private Map<String, Connection> address2Connection = new ConcurrentHashMap<>();
+    /**
+     * 客户端与服务端连接发生变化时的监听
+     */
+    private ClientStatusChangeListnner statusChangeListnner = (serverInfo, newStatu) -> {
+        log.info("statusChangeListnner serverInfo:" + serverInfo.toString() + " newStatu:" + newStatu);
+        //在创建新连接时主线程会等待客户端与服务端连接完成
+        //如果连接已经完成或者发生异常或者连接关闭了，则唤醒主线程
+        if (newStatu == Status.RUNNING || newStatu == Status.EXCEPTION || newStatu == Status.CLOSE) {
+            String key = serverInfo.toString().intern();
+            synchronized (key) {
+                key.notifyAll();
+            }
+        }
+    };
 
+    /**
+     * 客户端与服务端连接的缓存
+     */
+    private Map<String, Connection> address2Connection = new ConcurrentHashMap<>();
+    /**
+     * 控制客户端与服务端连接的线程池
+     */
     private ExecutorService connetionExecutor = Executors.newCachedThreadPool();
 
     private ConnectionManage() {
@@ -78,6 +100,7 @@ public class ConnectionManage {
      */
     public static void closeConnection(@NotNull ServerInfo serverInfo) {
         String key = getConnectionKey(serverInfo);
+        log.info("close connection key:" + key);
         CONNECTION_MANAGE.closeConnection(key);
     }
 
@@ -96,23 +119,48 @@ public class ConnectionManage {
         Connection connection = address2Connection.get(key);
         //如果没有拿到连接或者连接不可用则创建一个新的连接
         if (connection == null || !connection.isUsable()) {
+
             synchronized (key.intern()) {
+                //从缓存里面重新拿一次连接
+                connection = address2Connection.get(key);
+                //如果还是没拿到或者不可用，则创建一个新的连接
                 if (connection == null || !connection.isUsable()) {
-                    connection = ClientConnection.createClientConnection(serverInfo);
-                    if (connection.isUsable()) {
-                        address2Connection.put(key, connection);
-                        connetionExecutor.execute(connection);
-                    } else {
-                        closeConnection(key);
+                    //创建连接（但并不与服务端建立通讯）
+                    connection = ClientConnection.createClientConnection(serverInfo, statusChangeListnner);
+                    //使用线程池启动连接
+                    connetionExecutor.execute(connection);
+                    //注册连接
+                    registeConnection(key, connection);
+                    Status status;
+                    //如果当前连接处于创建状态或者启动中状态则等待
+                    if ((status = connection.getStatus()) == Status.NEW || status == Status.STARTING) {
+                        try {
+                            key.intern().wait(5000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
                     }
-                } else {
-                    connection = address2Connection.get(key);
+
                 }
+
+
             }
 
         }
+
         //如果最终拿到的依旧是一个不可用的连接，则返回null
         return connection.isUsable() ? connection : null;
+    }
+
+    private void registeConnection(String key, Connection newConnection) {
+        //获取旧的连接
+        Connection oldConnection = address2Connection.get(key);
+        //存在旧的连接并且就的连接与新连接不是同一个对象，则关闭旧的连接，再注册新的连接
+        if (oldConnection != null && oldConnection != newConnection) {
+            closeConnection(key);
+        }
+        address2Connection.put(key, newConnection);
     }
 
     /**
@@ -135,8 +183,13 @@ public class ConnectionManage {
      * @return key
      */
     private static String getConnectionKey(ServerInfo serverInfo) {
-        return serverInfo.getAddress() + "." + serverInfo.getPort();
+        return serverInfo.toString();
     }
 
+    public static void main(String[] args) {
+        ServerInfo serverInfo = new ServerInfo("127.0.0.1", 8888);
+        System.out.println("connectiong is null :" + (null == getConnection(serverInfo)));
+        closeConnection(serverInfo);
+    }
 
 }

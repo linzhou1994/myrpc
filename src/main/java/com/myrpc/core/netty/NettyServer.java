@@ -111,7 +111,7 @@ public class NettyServer {
             ChannelFuture f = b.bind(port).sync();
             status = Status.RUNNING;
             f.channel().closeFuture().sync();
-            status = Status.DEAD;
+            status = Status.CLOSE;
         } catch (Throwable e) {
             e.printStackTrace();
             status = Status.EXCEPTION;

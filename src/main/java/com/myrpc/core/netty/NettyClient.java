@@ -2,6 +2,7 @@ package com.myrpc.core.netty;
 
 import com.myrpc.core.client.connection.ConnectionManage;
 import com.myrpc.core.common.bo.ServerInfo;
+import com.myrpc.core.netty.listnner.ClientStatusChangeListnner;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -64,6 +65,7 @@ public class NettyClient {
 
     private List<ChannelHandler> childHandlerList;
 
+    private ClientStatusChangeListnner statusChangeListnner;
 
 
     public NettyClient(ServerInfo serverInfo) {
@@ -71,28 +73,40 @@ public class NettyClient {
         status = Status.NEW;
     }
 
+    public void setStatusChangeListnner(ClientStatusChangeListnner statusChangeListnner) {
+        this.statusChangeListnner = statusChangeListnner;
+    }
+
     public void setChildHandlerList(List<ChannelHandler> childHandlerList) {
         this.childHandlerList = childHandlerList;
     }
 
+    /**
+     * 启动客户端
+     */
     public void startClient() {
         status = Status.STARTING;
-            try {
-                startClient0();
-            } catch (Throwable e) {
-                e.printStackTrace();
-                status = Status.EXCEPTION;
-            } finally {
-                ConnectionManage.closeConnection(serverInfo);
-            }
+        notifyStatusChange();
+        try {
+
+            startClient0();
+
+        } catch (Throwable e) {
+            e.printStackTrace();
+
+            status = Status.EXCEPTION;
+            log.info("==============start Client error=============");
+        } finally {
+            ConnectionManage.closeConnection(serverInfo);
+            notifyStatusChange();
+        }
     }
 
     private void startClient0() throws InterruptedException {
         if (eventLoopGroup != null) {
             return;
         }
-
-        log.info("==============startClient=============");
+        log.info("==============startingClient=============");
 
         eventLoopGroup = new NioEventLoopGroup();
         final Bootstrap bootstrap = new Bootstrap();
@@ -115,9 +129,23 @@ public class NettyClient {
         });
 
         ChannelFuture channelFuture = bootstrap.connect(serverInfo.getAddress(), serverInfo.getPort()).sync();
+
         status = Status.RUNNING;
+        notifyStatusChange();
+        log.info("==============startClient=============");
+
         channelFuture.channel().closeFuture().sync();
-        status = Status.DEAD;
+
+        status = Status.CLOSE;
+    }
+
+    /**
+     * 发送客户端状态改变监听
+     */
+    private void notifyStatusChange() {
+        if (statusChangeListnner != null) {
+            statusChangeListnner.statusChange(serverInfo, status);
+        }
     }
 
     public Status getStatus() {
@@ -130,6 +158,6 @@ public class NettyClient {
      * @return
      */
     public boolean isUsable() {
-        return status == Status.NEW || status == Status.STARTING || status == Status.RUNNING;
+        return status == Status.RUNNING;
     }
 }

@@ -1,8 +1,11 @@
 package com.myrpc.utils;
 
+import com.myrpc.core.common.bo.ServerInfo;
 import org.apache.zookeeper.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * ////////////////////////////////////////////////////////////////////
@@ -43,28 +46,129 @@ import java.io.IOException;
  */
 public class ZooKeeperUtil {
 
-    private static void create(ZooKeeper zk, String path) throws KeeperException, InterruptedException {
-        int index = 1;
-        while ((index = path.indexOf("/", index)) > 0) {
-            String needCreatePath = path.substring(0,index);
-            if (!exists(zk,needCreatePath)){
-                zk.create(needCreatePath,"hallo".getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE,CreateMode.PERSISTENT);
+    private static final String rootPath = "/myrpc";
+
+    public static boolean create(ZooKeeper zk, String classPath, ServerInfo serverInfo) {
+
+        try {
+            String path = rootPath;
+            //创建根节点
+            if (createPersistentNode(zk, path)) {
+                return false;
             }
+
+            if (!classPath.substring(0, 1).equals("/")) {
+                path = path + "/" + classPath;
+            } else {
+                path = path + classPath;
+
+            }
+            //创建二级节点，节点路径为类路径
+            if (createPersistentNode(zk, path)) {
+                return false;
+            }
+
+            path = path + "/" + serverInfo.toString();
+            byte[] data = Serializer.serialize(serverInfo);
+            if (exists(zk, path)) {
+                zk.setData(path, data, 0);
+            } else {
+                try {
+                    zk.create(path, data, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    if (exists(zk, path)) {
+                        zk.setData(path, data, 0);
+                    } else {
+                        return false;
+                    }
+                }
+            }
+
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
-    private static boolean exists(ZooKeeper zk, String path) throws KeeperException, InterruptedException {
-        return zk.exists("/idea", false) != null;
+    public static <T> List<T> getData(ZooKeeper zk, String classPath) {
+        List<T> rlt = new ArrayList<>();
+        List<String> serverStrList = null;
+        String path = rootPath + "/" + classPath;
+
+        try {
+            serverStrList = zk.getChildren(path, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (serverStrList != null && !serverStrList.isEmpty()) {
+
+            serverStrList.forEach(serverStr -> {
+                try {
+                    byte[] data = zk.getData(path + "/" + serverStr, false, null);
+                    T t = (T) Serializer.deserialize(data);
+                    rlt.add(t);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+
+        return rlt;
     }
 
-    public static void main(String[] args) throws IOException, KeeperException, InterruptedException {
+    private static boolean createPersistentNode(ZooKeeper zk, String path) throws KeeperException, InterruptedException {
+        if (!exists(zk, path)) {
+            try {
+                zk.create(path, path.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (!exists(zk, path)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean exists(ZooKeeper zk, String path) throws KeeperException, InterruptedException {
+        return zk.exists(path, false) != null;
+    }
+
+    public static void main(String[] args) throws IOException {
         ZooKeeper zk = new ZooKeeper("127.0.0.1:2181", 2000, new Watcher() {
             @Override
             public void process(WatchedEvent watchedEvent) {
 
             }
         });
-        create(zk,"/myrpc/server");
-        Thread.sleep(6000);
+        ZooKeeper zk2 = new ZooKeeper("127.0.0.1:2181", 2000, new Watcher() {
+            @Override
+            public void process(WatchedEvent watchedEvent) {
+
+            }
+        });
+        ZooKeeper zk3 = new ZooKeeper("127.0.0.1:2181", 2000, new Watcher() {
+            @Override
+            public void process(WatchedEvent watchedEvent) {
+
+            }
+        });
+
+        ServerInfo serverInfo1 = new ServerInfo("8888", "127.0.0.1", 8888);
+        ServerInfo serverInfo2 = new ServerInfo("8080", "127.0.0.1", 8080);
+        String classPath = ZooKeeperUtil.class.getName();
+        System.out.println("class path :" + classPath);
+        System.out.println("zk create serverinfo1 result:" + create(zk, classPath, serverInfo1));
+        System.out.println("zk2 create serverinfo2 result:" + create(zk2, classPath, serverInfo2));
+
+        List<ServerInfo> serverInfoList = getData(zk3, classPath);
+
+        System.out.println("serverInfoList toString:" + serverInfoList.toString());
+
+
     }
 }

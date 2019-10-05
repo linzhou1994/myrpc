@@ -1,5 +1,7 @@
 package com.myrpc.core.common.bo;
 
+import java.io.Serializable;
+
 /**
  * ////////////////////////////////////////////////////////////////////
  * //                          _ooOoo_                               //
@@ -37,14 +39,30 @@ package com.myrpc.core.common.bo;
  * @author: linzhou
  * @描述: 服务器信息存储类
  */
-public class ServerInfo {
+public class ServerInfo implements Serializable {
+    /**
+     * 服务器名称
+     */
+    private String serverName;
+    /**
+     * 服务器ip
+     */
     private String address;
-
+    /**
+     * 服务器端口
+     */
     private int port;
 
     public ServerInfo(String address, int port) {
         this.address = address;
         this.port = port;
+    }
+
+
+    public ServerInfo(String serverName, String address, int port) {
+        this.address = address;
+        this.port = port;
+        this.serverName = serverName;
     }
 
     public String getAddress() {
@@ -53,5 +71,14 @@ public class ServerInfo {
 
     public int getPort() {
         return port;
+    }
+
+    @Override
+    public String toString() {
+        return "ServerInfo{" +
+                "address='" + address + '\'' +
+                ", port=" + port +
+                ", serverName='" + serverName + '\'' +
+                '}';
     }
 }
