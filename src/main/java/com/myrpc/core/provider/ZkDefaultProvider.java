@@ -55,6 +55,7 @@ public class ZkDefaultProvider extends BaseMyRpcProvider {
         this.zooKeeper = zooKeeper;
     }
 
+    @Override
     public void registered0(Object object) throws Exception {
 
     }

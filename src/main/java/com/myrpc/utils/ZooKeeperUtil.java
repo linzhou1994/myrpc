@@ -46,19 +46,20 @@ import java.util.List;
  */
 public class ZooKeeperUtil {
 
-    private static final String rootPath = "/myrpc";
+    private static final String ROOT_PATH = "/myrpc";
+
+    private static final String PATH_SPLIT = "/";
 
     public static boolean create(ZooKeeper zk, String classPath, ServerInfo serverInfo) {
-
         try {
-            String path = rootPath;
+            String path = ROOT_PATH;
             //创建根节点
             if (createPersistentNode(zk, path)) {
                 return false;
             }
 
-            if (!classPath.substring(0, 1).equals("/")) {
-                path = path + "/" + classPath;
+            if (!PATH_SPLIT.equals(classPath.substring(0, 1))) {
+                path = path + PATH_SPLIT + classPath;
             } else {
                 path = path + classPath;
 
@@ -68,7 +69,7 @@ public class ZooKeeperUtil {
                 return false;
             }
 
-            path = path + "/" + serverInfo.toString();
+            path = path + PATH_SPLIT + serverInfo.toString();
             byte[] data = Serializer.serialize(serverInfo);
             if (exists(zk, path)) {
                 zk.setData(path, data, 0);
@@ -96,7 +97,7 @@ public class ZooKeeperUtil {
     public static <T> List<T> getData(ZooKeeper zk, String classPath) {
         List<T> rlt = new ArrayList<>();
         List<String> serverStrList = null;
-        String path = rootPath + "/" + classPath;
+        String path = ROOT_PATH + PATH_SPLIT + classPath;
 
         try {
             serverStrList = zk.getChildren(path, false);
@@ -108,7 +109,7 @@ public class ZooKeeperUtil {
 
             serverStrList.forEach(serverStr -> {
                 try {
-                    byte[] data = zk.getData(path + "/" + serverStr, false, null);
+                    byte[] data = zk.getData(path + PATH_SPLIT + serverStr, false, null);
                     T t = (T) Serializer.deserialize(data);
                     rlt.add(t);
                 } catch (Exception e) {

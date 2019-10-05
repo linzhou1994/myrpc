@@ -41,7 +41,7 @@ import java.util.Properties;
  * ---------------------------
  * 项目名： MyUtils
  * 包名：   com.my.utils.fileutils
- * 创建者:  linzhou
+ * @author :  linzhou
  * 创建时间:18/10/21
  * 描述:
  */
@@ -108,7 +108,7 @@ public class PropsUtil {
         if (props.containsKey(key)) {
             try {
                 value = Integer.parseInt(props.getProperty(key));
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -137,6 +137,7 @@ public class PropsUtil {
         }
         return value;
     }
+
     /**
      * 获取 boolean 类型属性（可指定默认值）
      */

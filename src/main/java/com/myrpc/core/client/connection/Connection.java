@@ -59,6 +59,8 @@ public interface Connection extends Runnable {
     boolean isUsable();
 
     /**
+     * 获取当前连接的状态
+     *
      * @return 当前连接的状态
      */
     Status getStatus();

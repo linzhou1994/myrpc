@@ -41,6 +41,7 @@ import com.myrpc.core.server.container.ServiceContainerManager;
  */
 public abstract class BaseMyRpcProvider implements MyRpcProvider {
 
+    @Override
     public void registered(Object object) throws Exception {
         //向容器中加入对象服务
         ServiceContainerManager.CONTAINER.registered(object);
@@ -48,5 +49,11 @@ public abstract class BaseMyRpcProvider implements MyRpcProvider {
         registered0(object);
     }
 
+    /**
+     * 将object对象注册到注册中心中
+     *
+     * @param object
+     * @throws Exception
+     */
     protected abstract void registered0(Object object) throws Exception;
 }
