@@ -3,7 +3,8 @@ package com.myrpc;
 import com.myrpc.consumer.TestConsumer;
 import com.myrpc.core.client.config.ClientProxyConfig;
 import com.myrpc.core.client.connection.ConnectionManage;
-import com.myrpc.core.client.proxy.JavaClientProxy;
+import com.myrpc.core.client.proxy.DefaultJavaClientProxy;
+import com.myrpc.core.client.proxy.MyRpcClientProxy;
 import com.myrpc.core.common.bo.ServerInfo;
 
 /**
@@ -47,7 +48,7 @@ public class ClientStart {
     public static void main(String[] args) {
         ClientProxyConfig clientProxyConfig = new ClientProxyConfig();
         clientProxyConfig.setRetryCount(2);
-        JavaClientProxy proxy = new JavaClientProxy();
+        MyRpcClientProxy proxy = new DefaultJavaClientProxy();
         Test test = proxy.newProxyInstance(Test.class,clientProxyConfig,new TestConsumer());
         System.out.println(test.testString("test"));
         test.testVoid();

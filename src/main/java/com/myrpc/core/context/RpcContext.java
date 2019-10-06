@@ -1,12 +1,4 @@
-package com.myrpc.core.config;
-
-import com.myrpc.core.client.config.ClientProxyConfig;
-import com.myrpc.core.common.bo.ServerInfo;
-import com.myrpc.utils.PropsUtil;
-import com.myrpc.utils.SystemUtil;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.Properties;
+package com.myrpc.core.context;
 
 /**
  * ////////////////////////////////////////////////////////////////////
@@ -41,54 +33,23 @@ import java.util.Properties;
  * //                 不见满街漂亮妹，哪个归得程序员?                 //
  * ////////////////////////////////////////////////////////////////////
  *
- * @创建时间: 2019/9/24 20:21
+ * @创建时间: 2019/10/6 20:02
  * @author: linzhou
- * @描述: MyRpcConfig 系统配置参数读取存储类
+ * @描述: RpcContext
  */
-public class MyRpcConfig {
+public interface RpcContext {
 
-    private Properties properties;
     /**
-     * zk地址
+     * 将对象注册
+     *
+     * @param object
      */
-    private String zkAddress;
+    void registered(Object object);
+
     /**
-     * 本机服务器属性
+     * 得到指定类的代理对象
+     *
+     * @param clazz
      */
-    private ServerInfo serverInfo;
-
-    private ClientProxyConfig clientProxyConfig;
-
-    public MyRpcConfig(String fileName) {
-        if (StringUtils.isBlank(fileName)) {
-            throw new IllegalArgumentException("config file name error!");
-        }
-        properties = PropsUtil.loadProps(fileName);
-
-        zkAddress = PropsUtil.getString(properties, "zkAddress");
-
-        Long defaultOutTime = PropsUtil.getLong(properties, "defaultOutTime");
-        int defaultRetryCount = PropsUtil.getInt(properties, "defaultRetryCount");
-        clientProxyConfig = new ClientProxyConfig(defaultRetryCount, defaultOutTime);
-
-
-        String serverName = PropsUtil.getString(properties, "serverName");
-        int myRpcPort = PropsUtil.getInt(properties, "myRpcPort");
-        String address = SystemUtil.getIpAddress();
-
-        serverInfo = new ServerInfo(serverName, address, myRpcPort);
-
-    }
-
-    public String getZkAddress() {
-        return zkAddress;
-    }
-
-    public ClientProxyConfig getClientProxyConfig() {
-        return clientProxyConfig;
-    }
-
-    public ServerInfo getServerInfo() {
-        return serverInfo;
-    }
+    void getProxyObject(Class<?> clazz);
 }

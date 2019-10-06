@@ -64,6 +64,16 @@ public class ClientProxyConfig {
         this.timeOut = ClientProxyConfig.DEFAULT_TIME_OUT;
     }
 
+    public ClientProxyConfig(int retryCount, Long timeOut) {
+        this();
+        if (retryCount >= 0) {
+            this.retryCount = retryCount;
+        }
+        if (timeOut != null && timeOut > 0L) {
+            this.timeOut = timeOut;
+        }
+    }
+
     public int getRetryCount() {
         return retryCount;
     }

@@ -54,9 +54,9 @@ import java.lang.reflect.Proxy;
  * @描述: 使用jdk动态代理的客户端代理类
  */
 
-public class JavaClientProxy implements InvocationHandler {
+public class DefaultJavaClientProxy implements MyRpcClientProxy, InvocationHandler {
 
-    private static final Logger log = Logger.getLogger(JavaClientProxy.class);
+    private static final Logger log = Logger.getLogger(DefaultJavaClientProxy.class);
 
     private ClientProxyConfig config;
 
@@ -66,12 +66,11 @@ public class JavaClientProxy implements InvocationHandler {
 
     private MyRpcConsumer strategy;
 
-    public JavaClientProxy() {
+    public DefaultJavaClientProxy() {
     }
 
-
-
-    public <T> T newProxyInstance(Class clazz,ClientProxyConfig config, MyRpcConsumer strategy) {
+    @Override
+    public <T> T newProxyInstance(Class clazz, ClientProxyConfig config, MyRpcConsumer strategy) {
         setClazz(clazz);
         this.config = config;
         this.strategy = strategy;

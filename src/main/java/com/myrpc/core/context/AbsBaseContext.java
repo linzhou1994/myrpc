@@ -1,12 +1,11 @@
-package com.myrpc.core.config;
+package com.myrpc.core.context;
 
-import com.myrpc.core.client.config.ClientProxyConfig;
-import com.myrpc.core.common.bo.ServerInfo;
-import com.myrpc.utils.PropsUtil;
-import com.myrpc.utils.SystemUtil;
-import org.apache.commons.lang3.StringUtils;
+import com.myrpc.core.client.proxy.MyRpcClientProxy;
+import com.myrpc.core.config.MyRpcConfig;
+import com.myrpc.core.consumer.MyRpcConsumer;
+import com.myrpc.core.provider.MyRpcProvider;
 
-import java.util.Properties;
+import java.util.List;
 
 /**
  * ////////////////////////////////////////////////////////////////////
@@ -41,54 +40,43 @@ import java.util.Properties;
  * //                 不见满街漂亮妹，哪个归得程序员?                 //
  * ////////////////////////////////////////////////////////////////////
  *
- * @创建时间: 2019/9/24 20:21
+ * @创建时间: 2019/10/6 20:08
  * @author: linzhou
- * @描述: MyRpcConfig 系统配置参数读取存储类
+ * @描述: AbsBaseContext
  */
-public class MyRpcConfig {
+public abstract class AbsBaseContext implements RpcContext {
 
-    private Properties properties;
     /**
-     * zk地址
+     * 配置文件路径
      */
-    private String zkAddress;
+    private String configFilePath;
+
     /**
-     * 本机服务器属性
+     * myrpc配置信息
      */
-    private ServerInfo serverInfo;
+    private MyRpcConfig rpcConfig;
 
-    private ClientProxyConfig clientProxyConfig;
+    /**
+     * 注册中心消费者
+     */
+    private MyRpcConsumer rpcConsumer;
 
-    public MyRpcConfig(String fileName) {
-        if (StringUtils.isBlank(fileName)) {
-            throw new IllegalArgumentException("config file name error!");
-        }
-        properties = PropsUtil.loadProps(fileName);
+    /**
+     * 注册中心提供者
+     */
+    private MyRpcProvider rpcProvider;
 
-        zkAddress = PropsUtil.getString(properties, "zkAddress");
+    /**
+     * 动态代理工作类
+     */
+    private MyRpcClientProxy proxy;
 
-        Long defaultOutTime = PropsUtil.getLong(properties, "defaultOutTime");
-        int defaultRetryCount = PropsUtil.getInt(properties, "defaultRetryCount");
-        clientProxyConfig = new ClientProxyConfig(defaultRetryCount, defaultOutTime);
+    /**
+     * 获取需要注册Rpc服务的的对象集合
+     *
+     * @return 需要注册Rpc服务的的对象集合
+     */
+    protected abstract List<Object> getNeedRegisteredObjs();
 
 
-        String serverName = PropsUtil.getString(properties, "serverName");
-        int myRpcPort = PropsUtil.getInt(properties, "myRpcPort");
-        String address = SystemUtil.getIpAddress();
-
-        serverInfo = new ServerInfo(serverName, address, myRpcPort);
-
-    }
-
-    public String getZkAddress() {
-        return zkAddress;
-    }
-
-    public ClientProxyConfig getClientProxyConfig() {
-        return clientProxyConfig;
-    }
-
-    public ServerInfo getServerInfo() {
-        return serverInfo;
-    }
 }
