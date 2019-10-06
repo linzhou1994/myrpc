@@ -115,4 +115,20 @@ public class ReflectionUtil {
         }
         return rlt;
     }
+
+    /**
+     * 获取当前类实现接口的名称
+     *
+     * @param clazz 类
+     * @return
+     */
+    public static String[] getInterfaceNames(Class<?> clazz) {
+        Class<?>[] interfaces = clazz.getInterfaces();
+        String[] interfaceNames = new String[interfaces.length];
+        for (int i = 0; i < interfaces.length; i++) {
+            interfaceNames[i] = interfaces[i].getName();
+        }
+        return interfaceNames;
+    }
+
 }

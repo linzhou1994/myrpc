@@ -1,8 +1,9 @@
-package com.myrpc.core.common.bo;
+package com.myrpc.utils;
 
-import org.apache.commons.lang3.StringUtils;
-
-import java.io.Serializable;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
 
 /**
  * ////////////////////////////////////////////////////////////////////
@@ -37,74 +38,37 @@ import java.io.Serializable;
  * //                 不见满街漂亮妹，哪个归得程序员?                 //
  * ////////////////////////////////////////////////////////////////////
  *
- * @创建时间: 2019/9/22 0:21
+ * @创建时间: 2019/10/6 13:53
  * @author: linzhou
- * @描述: 服务器信息存储类
+ * @描述: SystemUtil
  */
-public class ServerInfo implements Serializable {
-    /**
-     * 服务器名称
-     */
-    private String serverName;
-    /**
-     * 服务器ip
-     */
-    private String address;
-    /**
-     * 服务器端口
-     */
-    private int port;
+public class SystemUtil {
 
-    public ServerInfo(String address, int port) {
-        this.address = address;
-        this.port = port;
+    public static void main(String[] args) {
+        System.out.println("本机IP:" + getIpAddress());
     }
 
-
-    public ServerInfo(String serverName, String address, int port) {
-        this.address = address;
-        this.port = port;
-        this.serverName = serverName;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public String getServerName() {
-        return serverName;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof ServerInfo) {
-            ServerInfo serverInfo = (ServerInfo) obj;
-            return StringUtils.equals(serverName, serverInfo.getServerName())
-                    && StringUtils.equals(address, serverInfo.getAddress())
-                    && port == serverInfo.getPort();
+    public static String getIpAddress() {
+        try {
+            Enumeration<NetworkInterface> allNetInterfaces = NetworkInterface.getNetworkInterfaces();
+            InetAddress ip;
+            while (allNetInterfaces.hasMoreElements()) {
+                NetworkInterface netInterface = allNetInterfaces.nextElement();
+                if (netInterface.isLoopback() || netInterface.isVirtual() || !netInterface.isUp()) {
+                    continue;
+                } else {
+                    Enumeration<InetAddress> addresses = netInterface.getInetAddresses();
+                    while (addresses.hasMoreElements()) {
+                        ip = addresses.nextElement();
+                        if (ip != null && ip instanceof Inet4Address) {
+                            return ip.getHostAddress();
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("IP地址获取失败" + e.toString());
         }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        int rlt = 17;
-        rlt = 31 * rlt + (serverName == null ? 0 : serverName.hashCode());
-        rlt = 31 * rlt + (address == null ? 0 : address.hashCode());
-        rlt = 31 * rlt + port;
-        return rlt;
-    }
-
-    @Override
-    public String toString() {
-        return "ServerInfo{" +
-                "address='" + address + '\'' +
-                ", port=" + port +
-                ", serverName='" + serverName + '\'' +
-                '}';
+        return "";
     }
 }

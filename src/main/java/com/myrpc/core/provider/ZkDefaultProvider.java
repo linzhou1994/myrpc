@@ -1,5 +1,9 @@
 package com.myrpc.core.provider;
 
+import com.myrpc.core.config.MyRpcConfig;
+import com.myrpc.utils.ReflectionUtil;
+import com.myrpc.utils.ZooKeeperUtil;
+import org.apache.log4j.Logger;
 import org.apache.zookeeper.ZooKeeper;
 
 /**
@@ -41,22 +45,42 @@ import org.apache.zookeeper.ZooKeeper;
  */
 public class ZkDefaultProvider extends BaseMyRpcProvider {
 
+    private static final Logger log = Logger.getLogger(ZkDefaultProvider.class);
+
     private ZooKeeper zooKeeper;
 
+    private MyRpcConfig myRpcConfig;
+
     /**
-     *
-     * @param zooKeeper  zk连接
-     * @param zkServerRootPath 当前服务在zk中的根路径
+     * @param zooKeeper zk连接
      */
-    public ZkDefaultProvider(ZooKeeper zooKeeper,String zkServerRootPath) {
-        if (zooKeeper == null){
+    public ZkDefaultProvider(ZooKeeper zooKeeper, MyRpcConfig myRpcConfig) {
+        if (zooKeeper == null) {
             throw new IllegalArgumentException("zooKeeper cannot is null!");
         }
+        if (myRpcConfig == null) {
+            throw new IllegalArgumentException("myRpcConfig cannot is null!");
+        }
         this.zooKeeper = zooKeeper;
+        this.myRpcConfig = myRpcConfig;
     }
 
     @Override
-    public void registered0(Object object) throws Exception {
+    public void registered0(Object object) {
+        //得到当前要注册的对象的类对象
+        Class<?> clazz = object.getClass();
+        //获取当前类对象实现的接口名称
+        String[] clazzNames = ReflectionUtil.getInterfaceNames(clazz);
+        //将每一个接口名称都注册到zk上
+        for (String clazzName : clazzNames) {
+
+            boolean registeResult = ZooKeeperUtil.create(zooKeeper, clazzName, myRpcConfig.getServerInfo());
+            if (registeResult) {
+                log.info("myrpc registered success, class name:" + clazzName);
+            } else {
+                log.error("myrpc registered error, class name:" + clazzName);
+            }
+        }
 
     }
 }

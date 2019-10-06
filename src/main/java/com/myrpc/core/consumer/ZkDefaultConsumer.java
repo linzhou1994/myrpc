@@ -1,8 +1,13 @@
-package com.myrpc.core.common.bo;
+package com.myrpc.core.consumer;
 
-import org.apache.commons.lang3.StringUtils;
+import com.myrpc.core.client.ClientRequest;
+import com.myrpc.core.common.bo.ServerInfo;
+import com.myrpc.core.config.MyRpcConfig;
+import com.myrpc.utils.ZooKeeperUtil;
+import org.apache.log4j.Logger;
+import org.apache.zookeeper.ZooKeeper;
 
-import java.io.Serializable;
+import java.util.List;
 
 /**
  * ////////////////////////////////////////////////////////////////////
@@ -37,74 +42,39 @@ import java.io.Serializable;
  * //                 不见满街漂亮妹，哪个归得程序员?                 //
  * ////////////////////////////////////////////////////////////////////
  *
- * @创建时间: 2019/9/22 0:21
+ * @创建时间: 2019/10/6 14:05
  * @author: linzhou
- * @描述: 服务器信息存储类
+ * @描述: ZkDefaultConsumer
  */
-public class ServerInfo implements Serializable {
-    /**
-     * 服务器名称
-     */
-    private String serverName;
-    /**
-     * 服务器ip
-     */
-    private String address;
-    /**
-     * 服务器端口
-     */
-    private int port;
+public class ZkDefaultConsumer implements MyRpcConsumer {
 
-    public ServerInfo(String address, int port) {
-        this.address = address;
-        this.port = port;
-    }
+    private static final Logger log = Logger.getLogger(ZkDefaultConsumer.class);
 
+    private ZooKeeper zooKeeper;
 
-    public ServerInfo(String serverName, String address, int port) {
-        this.address = address;
-        this.port = port;
-        this.serverName = serverName;
-    }
+    private MyRpcConfig myRpcConfig;
 
-    public String getAddress() {
-        return address;
-    }
+    private int pointer = 0;
 
-    public int getPort() {
-        return port;
-    }
-
-    public String getServerName() {
-        return serverName;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof ServerInfo) {
-            ServerInfo serverInfo = (ServerInfo) obj;
-            return StringUtils.equals(serverName, serverInfo.getServerName())
-                    && StringUtils.equals(address, serverInfo.getAddress())
-                    && port == serverInfo.getPort();
+    public ZkDefaultConsumer(ZooKeeper zooKeeper, MyRpcConfig myRpcConfig) {
+        if (zooKeeper == null) {
+            throw new IllegalArgumentException("zooKeeper cannot is null!");
         }
-        return false;
+        if (myRpcConfig == null) {
+            throw new IllegalArgumentException("myRpcConfig cannot is null!");
+        }
+        this.zooKeeper = zooKeeper;
+        this.myRpcConfig = myRpcConfig;
     }
 
     @Override
-    public int hashCode() {
-        int rlt = 17;
-        rlt = 31 * rlt + (serverName == null ? 0 : serverName.hashCode());
-        rlt = 31 * rlt + (address == null ? 0 : address.hashCode());
-        rlt = 31 * rlt + port;
-        return rlt;
-    }
-
-    @Override
-    public String toString() {
-        return "ServerInfo{" +
-                "address='" + address + '\'' +
-                ", port=" + port +
-                ", serverName='" + serverName + '\'' +
-                '}';
+    public ServerInfo getServerInfo(ClientRequest request) {
+        String clazzName = request.getClassName();
+        List<ServerInfo> data = ZooKeeperUtil.getData(zooKeeper, clazzName);
+        if (!data.isEmpty()) {
+            pointer %= data.size();
+            return data.get(pointer++);
+        }
+        return null;
     }
 }

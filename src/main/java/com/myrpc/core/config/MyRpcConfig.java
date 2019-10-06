@@ -1,6 +1,8 @@
 package com.myrpc.core.config;
 
+import com.myrpc.core.common.bo.ServerInfo;
 import com.myrpc.utils.PropsUtil;
+import com.myrpc.utils.SystemUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Properties;
@@ -50,13 +52,9 @@ public class MyRpcConfig {
      */
     private String zkAddress;
     /**
-     * 服务名称
+     * 本机服务器属性
      */
-    private String serverName;
-    /**
-     * 服务端口
-     */
-    private String myRpcPort;
+    private ServerInfo serverInfo;
     /**
      * 默认请求超时时间（可以不填，不填则为3000ms）
      */
@@ -67,30 +65,26 @@ public class MyRpcConfig {
     private Integer defaultRetryCount;
 
     public MyRpcConfig(String fileName) {
-        if (StringUtils.isBlank(fileName)){
+        if (StringUtils.isBlank(fileName)) {
             throw new IllegalArgumentException("config file name error!");
         }
         properties = PropsUtil.loadProps(fileName);
 
-        zkAddress = PropsUtil.getString(properties,"zkAddress");
+        zkAddress = PropsUtil.getString(properties, "zkAddress");
+        defaultOutTime = PropsUtil.getLong(properties, "defaultOutTime");
+        defaultRetryCount = PropsUtil.getInt(properties, "defaultRetryCount");
 
-        serverName = PropsUtil.getString(properties,"serverName");
-        myRpcPort = PropsUtil.getString(properties,"myRpcPort");
-        defaultOutTime = PropsUtil.getLong(properties,"defaultOutTime");
-        defaultRetryCount = PropsUtil.getInt(properties,"defaultRetryCount");
+
+        String serverName = PropsUtil.getString(properties, "serverName");
+        int myRpcPort = PropsUtil.getInt(properties, "myRpcPort");
+        String address = SystemUtil.getIpAddress();
+
+        serverInfo = new ServerInfo(serverName, address, myRpcPort);
 
     }
 
     public String getZkAddress() {
         return zkAddress;
-    }
-
-    public String getServerName() {
-        return serverName;
-    }
-
-    public String getMyRpcPort() {
-        return myRpcPort;
     }
 
     public Long getDefaultOutTime() {
@@ -99,5 +93,9 @@ public class MyRpcConfig {
 
     public Integer getDefaultRetryCount() {
         return defaultRetryCount;
+    }
+
+    public ServerInfo getServerInfo() {
+        return serverInfo;
     }
 }
