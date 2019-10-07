@@ -4,8 +4,11 @@ import com.myrpc.core.client.proxy.MyRpcClientProxy;
 import com.myrpc.core.config.MyRpcConfig;
 import com.myrpc.core.consumer.MyRpcConsumer;
 import com.myrpc.core.provider.MyRpcProvider;
+import org.apache.log4j.Logger;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * ////////////////////////////////////////////////////////////////////
@@ -46,30 +49,38 @@ import java.util.List;
  */
 public abstract class AbsBaseContext implements RpcContext {
 
+    private static final Logger log = Logger.getLogger(AbsBaseContext.class);
+
     /**
      * 配置文件路径
      */
-    private String configFilePath;
+    protected String configFilePath;
 
     /**
      * myrpc配置信息
      */
-    private MyRpcConfig rpcConfig;
+    protected MyRpcConfig rpcConfig;
 
     /**
      * 注册中心消费者
      */
-    private MyRpcConsumer rpcConsumer;
+    protected MyRpcConsumer rpcConsumer;
 
     /**
      * 注册中心提供者
      */
-    private MyRpcProvider rpcProvider;
+    protected MyRpcProvider rpcProvider;
 
     /**
      * 动态代理工作类
      */
-    private MyRpcClientProxy proxy;
+    protected MyRpcClientProxy proxy;
+
+    protected Map<Class<?>, Object> clazz2ClientProxyObj;
+
+    public AbsBaseContext() {
+        clazz2ClientProxyObj = new ConcurrentHashMap<>();
+    }
 
     /**
      * 获取需要注册Rpc服务的的对象集合
@@ -78,5 +89,34 @@ public abstract class AbsBaseContext implements RpcContext {
      */
     protected abstract List<Object> getNeedRegisteredObjs();
 
+    public void init() {
+        List<Object> needRegisteredObjs = getNeedRegisteredObjs();
+        if (needRegisteredObjs != null && !needRegisteredObjs.isEmpty()) {
+            needRegisteredObjs.forEach(obj -> {
+                try {
+                    registered(obj);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    log.error("registered obj error,obj toString" + obj.toString());
+                }
+            });
+        }
+    }
 
+    @Override
+    public void registered(Object object) throws Exception {
+        rpcProvider.registered(object);
+    }
+
+    @Override
+    public <T> T getProxyObject(Class<?> clazz) {
+
+        T rlt = (T) clazz2ClientProxyObj.get(clazz);
+        if (rlt == null) {
+            rlt = proxy.newProxyInstance(clazz, rpcConfig.getClientProxyConfig(), rpcConsumer);
+            clazz2ClientProxyObj.put(clazz, rlt);
+        }
+
+        return rlt;
+    }
 }

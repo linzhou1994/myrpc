@@ -46,6 +46,10 @@ import java.util.Properties;
  * @描述: MyRpcConfig 系统配置参数读取存储类
  */
 public class MyRpcConfig {
+    /**
+     * 包路径分隔符
+     */
+    private static final String PACKAGE_PATH_SPLIT = ";";
 
     private Properties properties;
     /**
@@ -53,31 +57,53 @@ public class MyRpcConfig {
      */
     private String zkAddress;
     /**
+     * 需要扫描的包路径，多个包路径以";"隔开
+     * 扫描包路径下的所有java文件，找出需要注册rpc服务的类
+     */
+    private String[] scanfPackagePaths;
+    /**
      * 本机服务器属性
      */
     private ServerInfo serverInfo;
-
+    /**
+     * 客户端代理配置
+     */
     private ClientProxyConfig clientProxyConfig;
 
     public MyRpcConfig(String fileName) {
         if (StringUtils.isBlank(fileName)) {
             throw new IllegalArgumentException("config file name error!");
         }
+
+        init(fileName);
+
+        initClientProxyConfig();
+
+        initServerInfo();
+
+    }
+
+    private void init(String fileName) {
         properties = PropsUtil.loadProps(fileName);
 
         zkAddress = PropsUtil.getString(properties, "zkAddress");
+        String scanfPackagePath = PropsUtil.getString(properties, "scanfPackagePath");
+        if (StringUtils.isNotBlank(scanfPackagePath)) {
+            this.scanfPackagePaths = scanfPackagePath.split(PACKAGE_PATH_SPLIT);
+        }
+    }
 
+    private void initClientProxyConfig() {
         Long defaultOutTime = PropsUtil.getLong(properties, "defaultOutTime");
         int defaultRetryCount = PropsUtil.getInt(properties, "defaultRetryCount");
         clientProxyConfig = new ClientProxyConfig(defaultRetryCount, defaultOutTime);
+    }
 
-
+    private void initServerInfo() {
         String serverName = PropsUtil.getString(properties, "serverName");
         int myRpcPort = PropsUtil.getInt(properties, "myRpcPort");
         String address = SystemUtil.getIpAddress();
-
         serverInfo = new ServerInfo(serverName, address, myRpcPort);
-
     }
 
     public String getZkAddress() {
@@ -90,5 +116,9 @@ public class MyRpcConfig {
 
     public ServerInfo getServerInfo() {
         return serverInfo;
+    }
+
+    public String[] getScanfPackagePaths() {
+        return scanfPackagePaths;
     }
 }

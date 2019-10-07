@@ -44,12 +44,12 @@ public interface RpcContext {
      *
      * @param object
      */
-    void registered(Object object);
+    void registered(Object object) throws Exception;
 
     /**
      * 得到指定类的代理对象
      *
      * @param clazz
      */
-    void getProxyObject(Class<?> clazz);
+    <T> T getProxyObject(Class<?> clazz);
 }
