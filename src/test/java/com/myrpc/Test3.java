@@ -1,9 +1,4 @@
-package com.myrpc.core.annotation;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package com.myrpc;
 
 /**
  * ////////////////////////////////////////////////////////////////////
@@ -38,11 +33,10 @@ import java.lang.annotation.Target;
  * //                 不见满街漂亮妹，哪个归得程序员?                 //
  * ////////////////////////////////////////////////////////////////////
  *
- * @创建时间: 2019/9/22 0:06
+ * @创建时间: 2019/10/14 0:46
  * @author: linzhou
- * @描述: MyRpcServer
+ * @描述: Test3
  */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface MyRpcServer {
+public interface Test3 {
+    int Test3();
 }

@@ -1,8 +1,6 @@
 package com.myrpc;
 
-import com.myrpc.core.provider.MyRpcProvider;
-import com.myrpc.core.server.RpcServer;
-import com.myrpc.provider.TestProvider;
+import com.myrpc.zk.context.ZkDefaultContext;
 
 /**
  * ////////////////////////////////////////////////////////////////////
@@ -43,10 +41,13 @@ import com.myrpc.provider.TestProvider;
  */
 public class ServiceStart {
     public static void main(String[] args) throws Exception {
-        MyRpcProvider provider = new TestProvider();
-        provider.registered(new TestImpl());
-        RpcServer server = new RpcServer(8888);
-        server.startServer();
 
+        ZkDefaultContext context = new ZkDefaultContext();
+        context.registered(new TestImpl());
+        context.init();
+        Thread.sleep(2000L);
+
+        Test3 test3 = context.getProxyObject(Test3.class);
+        System.out.println(test3.Test3());
     }
 }

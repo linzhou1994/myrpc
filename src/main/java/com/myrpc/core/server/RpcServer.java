@@ -59,7 +59,15 @@ public class RpcServer {
         this.port = port;
     }
 
+    /**
+     * 启动客户端
+     */
     public void startServer() {
+        //noinspection AlibabaAvoidManuallyCreateThread
+        new Thread(() -> startServer0()).start();
+    }
+
+    public void startServer0() {
         log.info("=========服务端开始启动 端口：" + port + "==============");
         server = new NettyServer(port);
         List<Class<? extends ChannelHandler>> serverChannelHandlerList = getServerChannelHandlerList();

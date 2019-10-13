@@ -4,6 +4,7 @@ import com.myrpc.core.client.proxy.MyRpcClientProxy;
 import com.myrpc.core.config.MyRpcConfig;
 import com.myrpc.core.consumer.MyRpcConsumer;
 import com.myrpc.core.provider.MyRpcProvider;
+import com.myrpc.core.server.RpcServer;
 import org.apache.log4j.Logger;
 
 import java.util.List;
@@ -45,11 +46,11 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @创建时间: 2019/10/6 20:08
  * @author: linzhou
- * @描述: AbsBaseContext
+ * @描述: AbstractBaseContext
  */
-public abstract class AbsBaseContext implements RpcContext {
+public abstract class AbstractBaseContext implements RpcContext {
 
-    private static final Logger log = Logger.getLogger(AbsBaseContext.class);
+    private static final Logger log = Logger.getLogger(AbstractBaseContext.class);
 
     /**
      * 配置文件路径
@@ -67,7 +68,7 @@ public abstract class AbsBaseContext implements RpcContext {
     protected MyRpcConsumer rpcConsumer;
 
     /**
-     * 注册中心提供者
+     * 注册中心服务提供者
      */
     protected MyRpcProvider rpcProvider;
 
@@ -76,9 +77,14 @@ public abstract class AbsBaseContext implements RpcContext {
      */
     protected MyRpcClientProxy proxy;
 
+    /**
+     * 服务端
+     */
+    protected RpcServer server;
+
     protected Map<Class<?>, Object> clazz2ClientProxyObj;
 
-    public AbsBaseContext() {
+    public AbstractBaseContext() {
         clazz2ClientProxyObj = new ConcurrentHashMap<>();
     }
 
@@ -101,6 +107,9 @@ public abstract class AbsBaseContext implements RpcContext {
                 }
             });
         }
+
+        server = new RpcServer(rpcConfig.getServerInfo().getPort());
+        server.startServer();
     }
 
     @Override

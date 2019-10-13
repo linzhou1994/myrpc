@@ -35,7 +35,7 @@ package com.myrpc.core.provider;
  *
  * @创建时间: 2019/9/22 17:25
  * @author: linzhou
- * @描述: MyRpcProvider
+ * @描述: MyRpcProvider 服务提供者
  */
 public interface MyRpcProvider {
 

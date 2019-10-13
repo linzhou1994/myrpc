@@ -1,11 +1,7 @@
 package com.myrpc;
 
-import com.myrpc.consumer.TestConsumer;
-import com.myrpc.core.client.config.ClientProxyConfig;
-import com.myrpc.core.client.connection.ConnectionManage;
-import com.myrpc.core.client.proxy.DefaultJavaClientProxy;
-import com.myrpc.core.client.proxy.MyRpcClientProxy;
-import com.myrpc.core.common.bo.ServerInfo;
+import com.myrpc.zk.context.ZkDefaultContext;
+
 
 /**
  * ////////////////////////////////////////////////////////////////////
@@ -45,17 +41,21 @@ import com.myrpc.core.common.bo.ServerInfo;
  * @描述: ClientStart
  */
 public class ClientStart {
-    public static void main(String[] args) {
-        ClientProxyConfig clientProxyConfig = new ClientProxyConfig();
-        clientProxyConfig.setRetryCount(2);
-        MyRpcClientProxy proxy = new DefaultJavaClientProxy();
-        Test test = proxy.newProxyInstance(Test.class,clientProxyConfig,new TestConsumer());
-        System.out.println(test.testString("test"));
+    public static void main(String[] args) throws Exception {
+
+        ZkDefaultContext context = new ZkDefaultContext("myrpc2.properties");
+        context.registered(new Test3Impl());
+        context.init();
+        Thread.sleep(2000L);
+
+        Test test = context.getProxyObject(Test.class);
+        Test2 test2 = context.getProxyObject(Test2.class);
+
+
+        String testString =test.testString("test");
+        String test2String =test2.testString();
         test.testVoid();
-        Test2 test2 = proxy.newProxyInstance(Test2.class,clientProxyConfig,new TestConsumer());
-        System.out.println(test2.testString());
-        test2.testVoid();
-        ServerInfo serverInfo = new ServerInfo("127.0.0.1",8888);
-        ConnectionManage.closeConnection(serverInfo);
+        System.out.println(testString);
+        System.out.println(test2String);
     }
 }

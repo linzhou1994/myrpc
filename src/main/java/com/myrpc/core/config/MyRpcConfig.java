@@ -51,11 +51,36 @@ public class MyRpcConfig {
      */
     private static final String PACKAGE_PATH_SPLIT = ";";
 
+    /**
+     * 配置文件注册中心地址设置
+     */
+    private static final String REGISTRATION_CENTER_ADDRESS = "registrationCenterAddress";
+    /**
+     * MyRpc需要扫描的包路径设置
+     */
+    private static final String SCANF_PACKAGE_PATH = "scanfPackagePath";
+    /**
+     * 默认超时时间设置
+     */
+    private static final String DEFAULT_OUT_TIME = "defaultOutTime";
+    /**
+     * 默认重试次数设置
+     */
+    private static final String DEFAULT_RETRY_COUNT = "defaultRetryCount";
+    /**
+     * 服务端名称设置
+     */
+    private static final String SERVER_NAME = "serverName";
+    /**
+     * 服务端开启监听端口设置
+     */
+    private static final String MYRPC_PORT = "myRpcPort";
+
     private Properties properties;
     /**
-     * zk地址
+     * zk注册中心地址
      */
-    private String zkAddress;
+    private String registrationCenterAddress;
     /**
      * 需要扫描的包路径，多个包路径以";"隔开
      * 扫描包路径下的所有java文件，找出需要注册rpc服务的类
@@ -86,28 +111,28 @@ public class MyRpcConfig {
     private void init(String fileName) {
         properties = PropsUtil.loadProps(fileName);
 
-        zkAddress = PropsUtil.getString(properties, "zkAddress");
-        String scanfPackagePath = PropsUtil.getString(properties, "scanfPackagePath");
+        registrationCenterAddress = PropsUtil.getString(properties, REGISTRATION_CENTER_ADDRESS);
+        String scanfPackagePath = PropsUtil.getString(properties, SCANF_PACKAGE_PATH);
         if (StringUtils.isNotBlank(scanfPackagePath)) {
             this.scanfPackagePaths = scanfPackagePath.split(PACKAGE_PATH_SPLIT);
         }
     }
 
     private void initClientProxyConfig() {
-        Long defaultOutTime = PropsUtil.getLong(properties, "defaultOutTime");
-        int defaultRetryCount = PropsUtil.getInt(properties, "defaultRetryCount");
+        Long defaultOutTime = PropsUtil.getLong(properties, DEFAULT_OUT_TIME);
+        int defaultRetryCount = PropsUtil.getInt(properties, DEFAULT_RETRY_COUNT);
         clientProxyConfig = new ClientProxyConfig(defaultRetryCount, defaultOutTime);
     }
 
     private void initServerInfo() {
-        String serverName = PropsUtil.getString(properties, "serverName");
-        int myRpcPort = PropsUtil.getInt(properties, "myRpcPort");
+        String serverName = PropsUtil.getString(properties, SERVER_NAME);
+        int myRpcPort = PropsUtil.getInt(properties, MYRPC_PORT);
         String address = SystemUtil.getIpAddress();
         serverInfo = new ServerInfo(serverName, address, myRpcPort);
     }
 
-    public String getZkAddress() {
-        return zkAddress;
+    public String getRegistrationCenterAddress() {
+        return registrationCenterAddress;
     }
 
     public ClientProxyConfig getClientProxyConfig() {
@@ -120,5 +145,9 @@ public class MyRpcConfig {
 
     public String[] getScanfPackagePaths() {
         return scanfPackagePaths;
+    }
+
+    public static void main(String[] args) {
+        MyRpcConfig rpcConfig = new MyRpcConfig("myrpc.properties");
     }
 }
