@@ -1,6 +1,7 @@
 package com.myrpc.core.server.provider;
 
 import com.myrpc.core.server.container.ServiceContainerManager;
+import org.apache.log4j.Logger;
 
 /**
  * ////////////////////////////////////////////////////////////////////
@@ -41,8 +42,12 @@ import com.myrpc.core.server.container.ServiceContainerManager;
  */
 public abstract class BaseMyRpcProvider implements MyRpcProvider {
 
+    private static final Logger log = Logger.getLogger(BaseMyRpcProvider.class);
+
     @Override
     public void registered(Object object) throws Exception {
+
+        log.info("MyRpcProvider registered class:"+object.getClass().toString());
         //向容器中加入对象服务
         ServiceContainerManager.CONTAINER.registered(object);
 

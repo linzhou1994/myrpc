@@ -92,6 +92,7 @@ public class ZkDefaultContext extends AbstractBaseContext {
 
         proxy = new DefaultJavaClientProxy();
 
+        startServer();
     }
 
     @Override

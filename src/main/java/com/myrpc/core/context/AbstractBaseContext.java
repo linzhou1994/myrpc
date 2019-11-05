@@ -88,6 +88,12 @@ public abstract class AbstractBaseContext implements RpcContext {
         clazz2ClientProxyObj = new ConcurrentHashMap<>();
     }
 
+    protected void startServer() {
+        server = new RpcServer(rpcConfig.getServerInfo().getPort());
+        server.startServer();
+        init();
+    }
+
     /**
      * 获取需要注册Rpc服务的的对象集合
      *
@@ -95,7 +101,7 @@ public abstract class AbstractBaseContext implements RpcContext {
      */
     protected abstract List<Object> getNeedRegisteredObjs();
 
-    public void init() {
+    private void init() {
         List<Object> needRegisteredObjs = getNeedRegisteredObjs();
         if (needRegisteredObjs != null && !needRegisteredObjs.isEmpty()) {
             needRegisteredObjs.forEach(obj -> {
@@ -108,8 +114,6 @@ public abstract class AbstractBaseContext implements RpcContext {
             });
         }
 
-        server = new RpcServer(rpcConfig.getServerInfo().getPort());
-        server.startServer();
     }
 
     @Override

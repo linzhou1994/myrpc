@@ -1,5 +1,6 @@
 package com.myrpc;
 
+import com.myrpc.core.annotation.MyRpcServer;
 import org.apache.log4j.Logger;
 
 /**
@@ -39,6 +40,7 @@ import org.apache.log4j.Logger;
  * @author: linzhou
  * @描述: TestImpl
  */
+@MyRpcServer
 public class TestImpl implements Test,Test2 {
     private static final Logger log = Logger.getLogger(TestImpl.class);
 

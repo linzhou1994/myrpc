@@ -43,9 +43,8 @@ public class ServiceStart {
     public static void main(String[] args) throws Exception {
 
         ZkDefaultContext context = new ZkDefaultContext();
-        context.registered(new TestImpl());
+//        context.registered(new TestImpl());
         context.registered(new Test3Impl());
-        context.init();
         Thread.sleep(2000L);
 
         Test3 test3 = context.getProxyObject(Test3.class);

@@ -45,7 +45,6 @@ public class ClientStart {
 
         ZkDefaultContext context = new ZkDefaultContext("myrpc2.properties");
         context.registered(new Test3Impl());
-        context.init();
         Thread.sleep(2000L);
 
         Test test = context.getProxyObject(Test.class);
@@ -57,13 +56,13 @@ public class ClientStart {
         test.testVoid();
         System.out.println(testString);
         System.out.println(test2String);
-        Test3 test3 = context.getProxyObject(Test3.class);
-        System.out.println(test3.Test3());
-        System.out.println(test3.Test3());
-        System.out.println(test3.Test3());
-        System.out.println(test3.Test3());
-        System.out.println(test3.Test3());
-        System.out.println(test3.Test3());
+//        Test3 test3 = context.getProxyObject(Test3.class);
+//        System.out.println(test3.Test3());
+//        System.out.println(test3.Test3());
+//        System.out.println(test3.Test3());
+//        System.out.println(test3.Test3());
+//        System.out.println(test3.Test3());
+//        System.out.println(test3.Test3());
 
     }
 }

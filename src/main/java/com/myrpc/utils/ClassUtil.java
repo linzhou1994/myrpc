@@ -5,8 +5,10 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.UnsupportedEncodingException;
 import java.net.JarURLConnection;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
@@ -122,6 +124,11 @@ public class ClassUtil {
     }
 
     private static void addClass(Set<Class<?>> classSet, String packagePath, String packageName) {
+        try {
+            packagePath = URLDecoder.decode(packagePath,"UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         File[] files = new File(packagePath).listFiles(new FileFilter() {
             @Override
             public boolean accept(File file) {
