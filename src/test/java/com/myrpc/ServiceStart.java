@@ -44,10 +44,13 @@ public class ServiceStart {
 
         ZkDefaultContext context = new ZkDefaultContext();
         context.registered(new TestImpl());
+        context.registered(new Test3Impl());
         context.init();
         Thread.sleep(2000L);
 
         Test3 test3 = context.getProxyObject(Test3.class);
+        System.out.println(test3.Test3());
+        System.out.println(test3.Test3());
         System.out.println(test3.Test3());
     }
 }

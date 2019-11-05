@@ -2,7 +2,7 @@ package com.myrpc.core.server.handler;
 
 import com.myrpc.core.client.ClientRequest;
 import com.myrpc.core.common.bo.MethodHandler;
-import com.myrpc.core.exception.ServerException;
+import com.myrpc.core.common.exception.ServerException;
 import com.myrpc.core.server.ServerResponse;
 import com.myrpc.core.server.container.ServiceContainerManager;
 import io.netty.channel.ChannelHandlerContext;

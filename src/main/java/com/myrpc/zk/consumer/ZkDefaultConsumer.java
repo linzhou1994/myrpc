@@ -3,7 +3,7 @@ package com.myrpc.zk.consumer;
 import com.myrpc.core.client.ClientRequest;
 import com.myrpc.core.common.bo.ServerInfo;
 import com.myrpc.core.config.MyRpcConfig;
-import com.myrpc.core.consumer.MyRpcConsumer;
+import com.myrpc.core.client.consumer.MyRpcConsumer;
 import com.myrpc.utils.ZooKeeperUtil;
 import org.apache.log4j.Logger;
 import org.apache.zookeeper.ZooKeeper;

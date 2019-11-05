@@ -1,4 +1,4 @@
-package com.myrpc.core.exception;
+package com.myrpc.core.common.exception;
 
 /**
  * ////////////////////////////////////////////////////////////////////

@@ -2,8 +2,8 @@ package com.myrpc.core.context;
 
 import com.myrpc.core.client.proxy.MyRpcClientProxy;
 import com.myrpc.core.config.MyRpcConfig;
-import com.myrpc.core.consumer.MyRpcConsumer;
-import com.myrpc.core.provider.MyRpcProvider;
+import com.myrpc.core.client.consumer.MyRpcConsumer;
+import com.myrpc.core.server.provider.MyRpcProvider;
 import com.myrpc.core.server.RpcServer;
 import org.apache.log4j.Logger;
 

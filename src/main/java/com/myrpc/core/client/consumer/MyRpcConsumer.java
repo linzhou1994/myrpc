@@ -1,4 +1,4 @@
-package com.myrpc.core.consumer;
+package com.myrpc.core.client.consumer;
 
 import com.myrpc.core.client.ClientRequest;
 import com.myrpc.core.common.bo.ServerInfo;

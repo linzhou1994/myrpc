@@ -1,7 +1,7 @@
 package com.myrpc.core.client.proxy;
 
 import com.myrpc.core.client.config.ClientProxyConfig;
-import com.myrpc.core.consumer.MyRpcConsumer;
+import com.myrpc.core.client.consumer.MyRpcConsumer;
 
 /**
  * ////////////////////////////////////////////////////////////////////

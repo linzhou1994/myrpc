@@ -1,4 +1,6 @@
-package com.myrpc.core.provider;
+package com.myrpc.core.server.provider;
+
+import com.myrpc.core.server.container.ServiceContainerManager;
 
 /**
  * ////////////////////////////////////////////////////////////////////
@@ -33,17 +35,25 @@ package com.myrpc.core.provider;
  * //                 不见满街漂亮妹，哪个归得程序员?                 //
  * ////////////////////////////////////////////////////////////////////
  *
- * @创建时间: 2019/9/22 17:25
+ * @创建时间: 2019/9/24 20:44
  * @author: linzhou
- * @描述: MyRpcProvider 服务提供者
+ * @描述: BaseMyRpcProvider
  */
-public interface MyRpcProvider {
+public abstract class BaseMyRpcProvider implements MyRpcProvider {
+
+    @Override
+    public void registered(Object object) throws Exception {
+        //向容器中加入对象服务
+        ServiceContainerManager.CONTAINER.registered(object);
+
+        registered0(object);
+    }
 
     /**
-     * 想注册中心注册服务
+     * 将object对象注册到注册中心中
      *
-     * @param object 要注册的对象
+     * @param object
      * @throws Exception
      */
-    void registered(Object object) throws Exception;
+    protected abstract void registered0(Object object) throws Exception;
 }

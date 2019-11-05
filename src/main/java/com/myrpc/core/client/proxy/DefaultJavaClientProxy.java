@@ -1,12 +1,12 @@
 package com.myrpc.core.client.proxy;
 
-import com.myrpc.core.consumer.MyRpcConsumer;
+import com.myrpc.core.client.consumer.MyRpcConsumer;
 import com.myrpc.core.client.ClientRequest;
 import com.myrpc.core.client.config.ClientProxyConfig;
 import com.myrpc.core.client.connection.Connection;
 import com.myrpc.core.client.connection.ConnectionManage;
 import com.myrpc.core.common.bo.ServerInfo;
-import com.myrpc.core.exception.ServerException;
+import com.myrpc.core.common.exception.ServerException;
 import com.myrpc.core.server.ServerResponse;
 import com.myrpc.utils.ReflectionUtil;
 import org.apache.log4j.Logger;

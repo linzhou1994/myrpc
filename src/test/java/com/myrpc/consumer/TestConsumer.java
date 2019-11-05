@@ -2,7 +2,7 @@ package com.myrpc.consumer;
 
 import com.myrpc.core.client.ClientRequest;
 import com.myrpc.core.common.bo.ServerInfo;
-import com.myrpc.core.consumer.MyRpcConsumer;
+import com.myrpc.core.client.consumer.MyRpcConsumer;
 
 /**
  * ////////////////////////////////////////////////////////////////////
